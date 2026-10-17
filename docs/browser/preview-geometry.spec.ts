@@ -221,7 +221,8 @@ test('MacBook preview geometry holds from 320 Fit to 2160 Actual', async ({ page
   // The caption may carry decimals (99.93%), so the whole percentage is parsed.
   const percentOf = (text: string) => Number(/([0-9]+(?:\.[0-9]+)?)%$/.exec(text)?.[1] ?? NaN);
   const fitRegion = preview.locator('.example-preview-fit');
-  // The MacBook has no manual zoom: the page width alone chooses Fit or 1:1.
+  // The MacBook has no manual zoom: the page width alone chooses Fit or 1:1. The human
+  // decision keeps Actual size visible and disabled while that choice is automatic.
   const actual = preview.getByRole('button', { name: /actual size 1:1/i });
   const expand = preview.getByRole('button', { name: /^expand$/i });
   const closeExpanded = preview.getByRole('button', { name: /^close expanded preview$/i });
@@ -264,7 +265,8 @@ test('MacBook preview geometry holds from 320 Fit to 2160 Actual', async ({ page
     expectFitInside(geometry);
     await expect.poll(logicalScreen).toEqual(expectedScreen);
     await expect(caption).toContainText('1440×900');
-    await expect(actual).toHaveCount(0);
+    await expect(actual).toBeVisible();
+    await expect(actual).toBeDisabled();
     await expect(expand).toBeVisible();
     await expectNoPageOverflow(page);
     await expectDraftKept();
@@ -357,7 +359,8 @@ test('MacBook preview geometry holds from 320 Fit to 2160 Actual', async ({ page
     expect(geometry.shownEndGap).toBeGreaterThanOrEqual(-1);
     expect(percentOf(geometry.caption)).toBe(100);
     await expect.poll(logicalScreen).toEqual(expectedScreen);
-    await expect(actual).toHaveCount(0);
+    await expect(actual).toBeVisible();
+    await expect(actual).toBeDisabled();
     await expect(expand).toBeHidden();
     await expectUnifiedControls();
     const layout = await expectColumns(width);
