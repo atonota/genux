@@ -26,7 +26,7 @@
 .documentation-nav a:focus {
   outline: none;
 }
-.documentation-nav a:focus-visible {
+:root[data-input-modality='keyboard'] .documentation-nav a:focus-visible {
   text-decoration: underline;
   text-decoration-color: var(--focus-color);
   text-decoration-thickness: var(--focus-marker);
@@ -150,19 +150,6 @@
   .doc-choice:hover {
     color: var(--ink);
   }
-}
-.docs-page-tools {
-  display: grid;
-  justify-items: start;
-  margin-block-start: var(--space-lg);
-}
-.docs-page-tools a {
-  display: inline-flex;
-  align-items: center;
-  min-block-size: var(--target-min);
-}
-.docs-page-tools p {
-  margin: 0;
 }
 /* Script-applied hidden states win over the display rules above and in layout.css. */
 :is(.doc-tabs, .docs-install-managers, .docs-page-tools > *)[hidden],

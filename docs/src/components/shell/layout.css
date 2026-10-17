@@ -39,17 +39,24 @@
 [data-docs-shell] .docs-main {
   padding: var(--inset-container-sm, 16px);
 }
-/* Below the 875px breakpoint the fixed Tweaker trigger (tweaker.css) sits at the middle of the
-   inline end edge. Only a main column that holds one keeps the trigger size, the container-sm
-   gap and the safe area clear beside its content; the header, the footer and wider layouts
-   keep their inset. Component pages hide that outer trigger, so their main column keeps the
-   container-sm inset on both sides: 288px of content at 320px. */
+/* The fixed Tweaker trigger (tweaker.css) sits at the middle of the inline end edge wherever
+   the article meets the viewport edge: every layout below the 80rem contents rail. One shell
+   clearance role names its size plus the safe area. Below the 875px breakpoint a guide main
+   column that holds a trigger keeps that clearance beside its content; the header, the footer
+   and wider layouts keep their inset. Component pages keep the right-edge tab (human decision
+   2026-10-17) and the protected 288px main column at 320px: their live preview spans the full
+   column, while every reading box, link and control of the article keeps the clearance (see
+   .component-detail below), so no lead line, section text or page tool ends under the tab. */
+@media (width < 80rem) {
+  [data-docs-shell] {
+    --shell-tweaker-clearance: calc(
+      var(--genux-tweaker-trigger-size, var(--target-min, 48px)) + env(safe-area-inset-right, 0px)
+    );
+  }
+}
 @media (width < 54.6875rem) {
   [data-docs-shell]:not([data-docs-component-page]) .docs-main:has([data-tweaker-trigger]) {
-    padding-inline-end: calc(
-      var(--inset-container-sm, 16px) + var(--genux-tweaker-trigger-size, var(--target-min, 48px)) +
-        env(safe-area-inset-right, 0px)
-    );
+    padding-inline-end: calc(var(--inset-container-sm, 16px) + var(--shell-tweaker-clearance));
   }
 }
 [data-docs-shell] .docs-shell > .sidebar {
@@ -124,6 +131,23 @@ dialog[data-docs-drawer][open] {
 .sidebar > .sidebar-note {
   flex: none;
 }
+/* Short viewports (phone landscape, small windows): the fixed title, search, feedback and
+   note no longer fit beside a bounded list, so the inner scroller would collapse to zero and
+   the note would overlap the Clear search action. The whole Drawer (or the page beside a
+   non-sticky sidebar) scrolls instead; nothing is hidden. */
+@media (height < 40rem) {
+  [data-docs-drawer-body],
+  [data-docs-drawer-body] > .sidebar,
+  [data-docs-shell] .sidebar .navigation,
+  [data-docs-shell] .sidebar .navigation nav,
+  [data-docs-shell] .sidebar [data-docs-nav-scroll] {
+    flex: none;
+    min-block-size: auto;
+  }
+  [data-docs-shell] .sidebar [data-docs-nav-scroll] {
+    overflow: visible;
+  }
+}
 @starting-style {
   dialog[data-docs-drawer][open] {
     translate: -100% 0;
@@ -186,8 +210,8 @@ dialog[data-docs-drawer][open]::backdrop {
   min-block-size: var(--target-min);
 }
 [data-docs-shell] .page-breadcrumb [aria-current='page'] {
-  color: var(--shell-ink, var(--ink));
-  font-weight: var(--font-weight-label, 600);
+  color: var(--panel-ink, var(--ink));
+  font-weight: var(--shell-ui-label);
 }
 
 /* Page contents: a closed disclosure until the rail breakpoint. */
@@ -217,8 +241,8 @@ dialog[data-docs-drawer][open]::backdrop {
 [data-docs-shell] .page-grid > [data-doc-nav='toc'] {
   display: none;
 }
+/* Rail titles take their weight from the shell emphasis role (contents.css, page-tools.css). */
 [data-docs-shell] .page-grid > [data-doc-nav='toc'] p {
-  font-weight: var(--font-weight-label, 550);
   margin-block: 0 var(--space-xs);
 }
 [data-docs-shell] .page-grid > [data-doc-nav='toc'] a {
@@ -229,30 +253,43 @@ dialog[data-docs-drawer][open]::backdrop {
   text-decoration: none;
 }
 
-/* Previous and next component in catalog order. */
+/* Catalog neighbours continue the article rhythm. At phone widths each destination gets
+   its own line; the missing first/last neighbour never becomes a disabled dead end. */
 [data-docs-shell] .page-neighbors {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-md);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--shell-ui-space-control);
+  margin-block: var(--shell-ui-space-ending) 0;
+  padding-block-start: var(--shell-ui-space-control);
 }
 [data-docs-shell] .page-neighbors a {
   display: grid;
-  flex: 1 1 12rem;
-  gap: var(--space-xs);
-  align-content: center;
-  min-block-size: var(--target-min);
-  padding: var(--space-sm) var(--space-md);
-  border-radius: var(--radius);
-  background: var(--panel-bg, var(--panel));
-  color: var(--panel-ink, var(--ink));
+  gap: var(--shell-ui-space-tight);
+  min-inline-size: 0;
+  min-block-size: var(--shell-ui-target);
+  padding-block: var(--shell-ui-space-control);
+  color: var(--shell-ui-reading-ink);
   text-decoration: none;
 }
-[data-docs-shell] .page-neighbors a > span:first-child {
-  color: var(--muted);
+[data-docs-shell] .page-neighbor-direction {
+  display: inline-flex;
+  gap: var(--shell-ui-space-tight);
+  color: var(--shell-ui-reading-muted);
+  font-size: var(--shell-ui-text);
 }
-[data-docs-shell] .page-neighbors a[rel~='next'] {
-  margin-inline-start: auto;
-  text-align: end;
+[data-docs-shell] .page-neighbor-title {
+  font-size: var(--shell-ui-destination-size);
+  font-weight: var(--shell-ui-emphasis);
+}
+@media (min-width: 40rem) {
+  [data-docs-shell] .page-neighbors {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  [data-docs-shell] .page-neighbors a[rel='next'] {
+    grid-column: 2;
+    text-align: end;
+    justify-items: end;
+  }
 }
 
 /* Component detail fills the whole center column between the sidebar and the contents rail
@@ -267,25 +304,57 @@ dialog[data-docs-drawer][open]::backdrop {
   inline-size: 100%;
   min-inline-size: 0;
 }
+/* Below the contents rail the article meets the viewport edge where the fixed Tweaker tab
+   sits: reading boxes, links and controls keep the shell clearance, the live preview keeps the
+   full column and its own protected geometry, and self-scrolling tables and code stay inside
+   the padded sections. The tab row scrolls horizontally and paints its content across its own
+   padding, so it ends before the tab with a margin instead. */
+@media (width < 80rem) {
+  [data-docs-shell][data-docs-component-page]
+    .component-detail
+    > :not(.component-showcase, .component-reference, .doc-tabs),
+  [data-docs-shell][data-docs-component-page] .doc-section:not([data-doc-section='examples']),
+  [data-docs-shell][data-docs-component-page] [data-doc-section='examples'] > :not(.live-preview) {
+    padding-inline-end: var(--shell-tweaker-clearance);
+  }
+  [data-docs-shell][data-docs-component-page] .component-detail > .doc-tabs {
+    margin-inline-end: var(--shell-tweaker-clearance);
+  }
+}
 /* Compact primary links join the header band from 80rem; the Drawer navigation covers
-   narrower widths. */
+   narrower widths. Below the 875px sidebar breakpoint the Drawer's Start group also owns the
+   Getting started route, so the sticky header stays at two rows on a phone (one row in phone
+   landscape) and never meets the viewport-fixed Tweaker tab. */
 [data-docs-shell] .header-primary {
   display: none;
-  gap: var(--space-sm);
+  gap: var(--shell-ui-space-control);
+  flex-wrap: wrap;
+}
+@media (width < 54.6875rem) {
+  [data-docs-shell] .header-link {
+    display: none;
+  }
 }
 [data-docs-shell] .header-primary a {
   display: inline-flex;
   align-items: center;
-  min-block-size: var(--target-min);
+  min-block-size: var(--shell-ui-target);
+  color: var(--shell-ui-muted);
+  font-weight: var(--shell-ui-label);
+  text-decoration: none;
+}
+@media (any-hover: hover) {
+  [data-docs-shell] .header-primary a:hover {
+    color: var(--shell-ui-ink);
+    text-decoration: underline;
+    text-underline-offset: 0.25em;
+  }
 }
 
 @media (min-width: 54.6875rem) {
-  /* One header band: the meta line grows between the wordmark and the controls. */
+  /* One header band when content fits; wrapping never changes its Tab order. */
   [data-docs-shell] .docs-header {
     column-gap: var(--space-md);
-  }
-  [data-docs-shell] .header-meta {
-    flex: 1 1 auto;
   }
   [data-docs-shell] .header-link {
     flex: none;
@@ -310,6 +379,13 @@ dialog[data-docs-drawer][open]::backdrop {
   }
   [data-docs-shell] .docs-main {
     padding: var(--inset-container-md, 24px);
+  }
+  /* In a short window the sidebar leaves the sticky rail height and scrolls with the page. */
+  @media (height < 40rem) {
+    [data-docs-shell] .docs-shell > .sidebar {
+      position: static;
+      block-size: auto;
+    }
   }
 }
 @media (min-width: 70.625rem) {
@@ -349,10 +425,12 @@ dialog[data-docs-drawer][open]::backdrop {
     max-block-size: var(--shell-rail-block-size);
     overflow-y: auto;
     overscroll-behavior: contain;
-    scrollbar-gutter: stable;
   }
   /* The rail replaces the disclosure; only one set of section links is visible. */
-  [data-docs-shell] .page-grid:has(> [data-doc-nav='toc']) [data-doc-contents] {
+  [data-docs-shell]
+    .page-grid:not([data-docs-guide-grid]):has(> [data-doc-nav='toc'])
+    [data-doc-contents],
+  [data-docs-shell] [data-docs-guide-grid][data-shell-contents-ready] [data-doc-contents] {
     display: none;
   }
   /* Component pages: the center column meets both rails without outer gaps or main inline
@@ -369,5 +447,29 @@ dialog[data-docs-drawer][open]::backdrop {
     --docs-article-inset: var(--inset-container-md, 24px);
     box-sizing: border-box;
     padding-inline: var(--docs-article-inset);
+  }
+}
+
+[data-docs-shell] .docs-article {
+  min-inline-size: 0;
+}
+@media (width < 54.6875rem) {
+  /* A fixed right-edge Tweaker remains operable; narrow page tools do not extend beneath it. */
+  [data-docs-shell] [data-doc-tools='article'] {
+    padding-inline-end: var(--shell-tweaker-clearance);
+  }
+}
+
+/* Older guide views already carry a page-grid/Contents pair. The shared outer rail now
+   owns that navigation; flatten only their shell layout, leaving all article content intact. */
+[data-docs-shell] [data-docs-guide-grid] .docs-article > .page-grid {
+  display: block;
+}
+[data-docs-shell] [data-docs-guide-grid] .docs-article > .page-grid > [data-doc-nav='toc'] {
+  display: none;
+}
+@media (min-width: 80rem) {
+  [data-docs-shell] [data-docs-guide-grid]:not([data-shell-contents-ready]) [data-doc-contents] {
+    display: block;
   }
 }

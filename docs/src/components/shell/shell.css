@@ -9,44 +9,36 @@
   background-color: var(--shell-bg);
   color: var(--shell-ink);
 }
-/* Header flow keeps the DOM and Tab order: menu, wordmark and Search documentation, then
-   language, theme, primary links and Getting started. Below the 875px breakpoint that is two
-   rows at 320px; layout.css joins them into one band from the breakpoint. The meta line only
-   shows from 1920px (120rem), where the band has room for it. */
+/* Header hierarchy: brand and search first, preferences next, then primary routes.
+   Version metadata belongs to the shared footer; wrapping preserves the same Tab order. */
 .docs-header {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: var(--space-xs) var(--space-sm);
-  margin: auto;
-  padding: var(--space-md) var(--page-gutter);
-  border-bottom: 1px solid var(--line);
+  gap: var(--shell-ui-space-tight) var(--shell-ui-space-control);
+  margin: 0;
+  padding: var(--shell-ui-space-control) var(--page-gutter);
+  border-bottom: 1px solid var(--shell-ui-rule);
   background-color: var(--shell-bg);
-  color: var(--shell-ink);
+  color: var(--shell-ui-ink);
+  font-size: var(--shell-ui-text);
+  line-height: var(--shell-ui-line-height);
 }
 .wordmark {
-  display: flex;
-  gap: 0.5rem;
+  display: inline-flex;
+  gap: var(--shell-ui-space-tight);
   align-items: baseline;
-  color: var(--ink);
+  min-block-size: var(--shell-ui-target);
+  color: var(--shell-ui-ink);
   text-decoration: none;
-  font-size: 1.5rem;
-  font-weight: var(--font-weight-label, 700);
+  font-size: var(--shell-ui-brand-size);
+  font-weight: var(--shell-ui-emphasis);
+  line-height: 2;
 }
 .wordmark span {
-  font-size: var(--text);
-  font-weight: var(--font-weight-label, 450);
-  color: var(--muted);
-}
-.header-meta {
-  color: var(--muted);
-  font-size: var(--text);
-  flex: 1 1 100%;
-}
-@media (width < 120rem) {
-  .header-meta {
-    display: none;
-  }
+  font-size: var(--shell-ui-text);
+  font-weight: var(--shell-ui-label);
+  color: var(--shell-ui-muted);
 }
 .docs-search-trigger {
   display: inline-flex;
@@ -78,13 +70,34 @@
     background: var(--surface);
   }
 }
+/* The filled Getting started action paints its own surface (not the shared .docs-action, which
+   the Overview content also uses). Hover reuses the central rest/hover opacity; keyboard focus
+   takes the central inverted action fill and its ink for the focus-01 underline, ringless. */
 .header-link {
-  flex: 1 1 0;
-  min-height: var(--target-min);
-  display: flex;
+  --focus-link-ink: var(--focus-button-ink);
+  display: inline-flex;
   align-items: center;
-  justify-content: flex-end;
-  text-align: end;
+  justify-content: center;
+  min-block-size: var(--shell-ui-target);
+  margin-inline-start: auto;
+  padding: var(--shell-ui-space-tight) var(--shell-ui-space-control);
+  border-radius: var(--shell-ui-radius);
+  background: var(--shell-ui-action);
+  color: var(--shell-ui-action-ink);
+  text-decoration: none;
+  font-weight: var(--shell-ui-label);
+  opacity: var(--opacity-rest);
+  transition: opacity var(--transition-duration) var(--motion-easing);
+}
+@media (any-hover: hover) {
+  .header-link:hover {
+    opacity: var(--opacity-hover);
+  }
+}
+:root[data-input-modality='keyboard'] .header-link:focus-visible {
+  background-color: var(--focus-button-bg);
+  color: var(--focus-button-ink);
+  text-decoration-color: var(--focus-button-ink);
 }
 .docs-menu-toggle,
 .docs-menu-close {
@@ -192,8 +205,8 @@
 /* The sidebar search is the canonical .genux-input-frame rendered by DocsNav; genux-input.css
    and focus-fields.css paint it from the shared field model, so the shell adds no well. */
 .sidebar-note {
-  color: var(--muted);
-  margin-top: var(--space-lg);
+  color: var(--shell-ui-muted);
+  margin-top: var(--shell-ui-space-group);
   padding-inline: var(--space-sm);
   font-size: var(--text);
 }
@@ -211,27 +224,25 @@
   text-decoration-thickness: var(--focus-indicator-width);
   text-underline-offset: 0.25em;
 }
-.toc {
-  background-color: var(--shell-bg);
-  color: var(--shell-ink);
-  font-size: var(--text);
-}
-.toc p {
-  font-weight: var(--font-weight-label, 550);
-  margin-bottom: var(--space-xs);
-}
-.toc a {
-  color: var(--muted);
-  text-decoration: none;
-}
-.docs-footer {
-  margin: auto;
-  padding: var(--space-lg) var(--page-gutter);
-  border-top: 1px solid var(--line);
+/* The shared ending follows the article, on its surface, without a decorative enclosure. */
+.shell-footer {
   display: flex;
-  gap: var(--space-md);
-  justify-content: space-between;
+  align-items: center;
   flex-wrap: wrap;
-  color: var(--muted);
-  background-color: var(--shell-bg);
+  gap: 0 var(--shell-ui-space-group);
+  margin-block-start: var(--shell-ui-space-ending);
+  padding-block: var(--shell-ui-space-control);
+  color: var(--shell-ui-reading-muted);
+  font-size: var(--shell-ui-text);
+  line-height: var(--shell-ui-line-height);
+}
+.shell-footer a {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: var(--shell-ui-target);
+}
+.shell-footer-brand {
+  color: var(--shell-ui-reading-ink);
+  font-weight: var(--shell-ui-emphasis);
+  text-decoration: none;
 }

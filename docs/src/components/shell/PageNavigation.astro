@@ -1,0 +1,34 @@
+---
+interface Neighbor {
+  slug: string;
+  title: string;
+}
+interface Props {
+  previous?: Neighbor;
+  next?: Neighbor;
+}
+const { previous, next } = Astro.props;
+---
+
+<nav class="page-neighbors" aria-label="Other components" data-i18n-aria-label="Other components">
+  {previous && (
+    <a href={'/components/' + previous.slug + '/'} rel="prev">
+      <span class="page-neighbor-direction">
+        <span aria-hidden="true">←</span> <span data-i18n="Previous">Previous</span>
+      </span>
+      <span class="page-neighbor-title" data-i18n={previous.title}>
+        {previous.title}
+      </span>
+    </a>
+  )}
+  {next && (
+    <a href={'/components/' + next.slug + '/'} rel="next">
+      <span class="page-neighbor-direction">
+        <span data-i18n="Next">Next</span> <span aria-hidden="true">→</span>
+      </span>
+      <span class="page-neighbor-title" data-i18n={next.title}>
+        {next.title}
+      </span>
+    </a>
+  )}
+</nav>

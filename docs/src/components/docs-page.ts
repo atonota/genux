@@ -1,38 +1,11 @@
 import { readMigratedItem } from '../storage-migration';
+import { translate } from '../i18n';
 
 // Component page behaviour for pages/components/[slug].astro: four tabs over the eight
 // server-rendered sections, active-tab filtering of the existing section and contents links,
 // copy as Markdown and the shared package manager. Without it every section stays readable.
 const defaultTab = 'examples';
 const managerKey = 'genux-package-manager';
-
-function repository(raw: unknown): string | undefined {
-  let url: URL;
-  try {
-    url = new URL(String(raw));
-  } catch {
-    return undefined;
-  }
-  const parts = url.pathname.split('/').filter(Boolean);
-  return url.protocol === 'https:' && url.hostname === 'github.com' && parts.length === 2
-    ? `${url.origin}/${parts.join('/')}`
-    : undefined;
-}
-// Edit links need a well-formed ref: slash-separated segments of letters, digits, `_`, `.` and
-// `-`, none starting with `.` or `-`, holding `..` or ending in `.` or `.lock`.
-const branchSegment = /^[A-Za-z0-9_][A-Za-z0-9_.-]*$/;
-const validSegment = (part: string) =>
-  branchSegment.test(part) && !part.includes('..') && !/[.](lock)?$/.test(part);
-function branch(raw: unknown): string | undefined {
-  const name = typeof raw === 'string' ? raw.trim() : '';
-  return name.split('/').every(validSegment) ? name : undefined;
-}
-/** Public repository for edit, issue, GitHub and clone links: the canonical GenUX repository
- * and its main branch unless a valid PUBLIC_GENUX_REPOSITORY_* override replaces them. */
-export const repositoryUrl: string =
-  repository(import.meta.env.PUBLIC_GENUX_REPOSITORY_URL) ?? 'https://github.com/atonota/genux';
-export const repositoryBranch: string =
-  branch(import.meta.env.PUBLIC_GENUX_REPOSITORY_BRANCH) ?? 'main';
 
 const text = (node: Element) => (node.textContent ?? '').trim().split(/\s+/).join(' ');
 const prefixes: Record<string, string> = { h1: '# ', h2: '## ', h3: '### ', li: '- ' };
@@ -43,11 +16,14 @@ const cell = (node: Element) => text(node).replace(/[\\|]/g, '\\$&');
 /** Markdown of the whole article, every tab included; live demos and controls are skipped. */
 function toMarkdown(article: HTMLElement): string {
   const blocks: string[] = [];
-  const nodes = article.querySelectorAll<HTMLElement>(
-    'h1, .lead, [data-doc-section] :is(h2, h3, p, li, pre, tr)',
-  );
+  const nodes = article.querySelectorAll<HTMLElement>('h1, h2, h3, p, li, pre, tr');
   for (const node of nodes) {
-    if (node.parentElement?.closest('pre, li, tr, [data-doc-demo], [data-install-managers]'))
+    if (
+      node.closest(
+        '[data-doc-demo], .genux-demo, astro-island, [data-doc-tools], [data-install-managers], .page-breadcrumb, .page-neighbors, footer, [data-doc-contents], [data-doc-tabs]',
+      ) ||
+      node.parentElement?.closest('pre, li, tr')
+    )
       continue;
     if (node.localName === 'pre') blocks.push('```\n' + (node.textContent ?? '').trim() + '\n```');
     else if (node.localName === 'tr') {
@@ -64,11 +40,15 @@ function toMarkdown(article: HTMLElement): string {
 /** Wires tabs, link filtering, copy and install choice; the disposer restores the SSR state. */
 export function installDocsPage(root: Document): () => void {
   const view = root.defaultView;
-  const article = root.querySelector<HTMLElement>('[data-component-detail]');
+  const article = root.querySelector<HTMLElement>('[data-component-detail], [data-doc-article]');
   const list = article?.querySelector<HTMLElement>('[data-doc-tabs]');
-  if (!view || !article || !list || article.hasAttribute('data-doc-page-ready')) return () => {};
+  if (!view || !article || article.hasAttribute('data-doc-page-ready')) return () => {};
 
-  const tabs = [...list.querySelectorAll<HTMLButtonElement>('[data-doc-tab]')];
+  const articleTools = article.querySelector('[data-doc-tools="article"]');
+  const contents = article.querySelector('[data-doc-contents]');
+  if (articleTools && contents) contents.after(articleTools);
+
+  const tabs = [...(list?.querySelectorAll<HTMLButtonElement>('[data-doc-tab]') ?? [])];
   const panels = [...article.querySelectorAll<HTMLElement>('[data-doc-panel]')];
   const links = [...root.querySelectorAll<HTMLAnchorElement>('[data-doc-nav] a[href^="#"]')];
   const install = article.querySelector<HTMLElement>('[data-install]');
@@ -130,13 +110,13 @@ export function installDocsPage(root: Document): () => void {
     End: () => tabs.length - 1,
   };
 
-  list.addEventListener(
+  list?.addEventListener(
     'click',
     event =>
       select('pushState', (event.target as Element).closest<HTMLButtonElement>('[data-doc-tab]')),
     { signal },
   );
-  list.addEventListener(
+  list?.addEventListener(
     'keydown',
     event => {
       const move = keys[event.key];
@@ -149,27 +129,33 @@ export function installDocsPage(root: Document): () => void {
     },
     { signal },
   );
-  view.addEventListener('hashchange', follow, { signal });
-  view.addEventListener('popstate', follow, { signal });
+  if (list) {
+    view.addEventListener('hashchange', follow, { signal });
+    view.addEventListener('popstate', follow, { signal });
+  }
 
   const clipboard = view.navigator.clipboard as Clipboard | undefined;
   for (const button of root.querySelectorAll<HTMLButtonElement>('[data-doc-copy-markdown]')) {
-    if (!clipboard) break;
+    if (typeof clipboard?.writeText !== 'function') break;
     const status = button.parentElement?.querySelector('[data-doc-copy-status]');
     const report = (message: string) => {
       const span = root.createElement('span');
       span.dataset.i18n = message;
-      span.textContent = message;
+      span.textContent = translate(message);
       status?.replaceChildren(span);
     };
     button.hidden = false;
     button.addEventListener(
       'click',
-      () =>
-        void clipboard.writeText(toMarkdown(article)).then(
-          () => report('Markdown copied.'),
-          () => report('Copy failed.'),
-        ),
+      async () => {
+        if (status) status.textContent = '';
+        try {
+          await clipboard.writeText(toMarkdown(article));
+          report('Markdown copied.');
+        } catch {
+          report('Copy failed.');
+        }
+      },
       { signal },
     );
   }
@@ -222,9 +208,9 @@ export function installDocsPage(root: Document): () => void {
   const restore = (node: Element, name: string, value: string | null) =>
     value === null ? node.removeAttribute(name) : node.setAttribute(name, value);
 
-  list.hidden = false;
+  if (list) list.hidden = false;
   article.setAttribute('data-doc-page-ready', '');
-  follow();
+  if (list) follow();
 
   return () => {
     controller.abort();
@@ -234,7 +220,7 @@ export function installDocsPage(root: Document): () => void {
       restore(panel, 'role', role);
       restore(panel, 'aria-labelledby', labelledBy);
     }
-    list.hidden = true;
+    if (list) list.hidden = true;
     article.removeAttribute('data-doc-page-ready');
   };
 }

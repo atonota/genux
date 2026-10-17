@@ -32,7 +32,9 @@ export function installDocsNavState(root: Document): () => void {
   let shown = false;
 
   const save = () => {
-    if (!rendered()) return;
+    // A list that is not a scroller (short viewports let the Drawer or page scroll instead)
+    // has nothing to remember and must not overwrite a stored position with 0.
+    if (!rendered() || scroller.scrollHeight <= scroller.clientHeight) return;
     try {
       view.sessionStorage.setItem(storageKey, String(Math.round(scroller.scrollTop)));
     } catch {

@@ -140,7 +140,7 @@ export default function PreviewWorkbench({ id, title, children }: PreviewWorkben
   // The visible Grid label names its switch through htmlFor.
   const gridSwitchId = `${titleId}-grid`;
   const dialogRef = useRef<HTMLDialogElement>(null);
-  const frame = usePreviewFrame({ id, title, anchorRef: dialogRef });
+  const frame = usePreviewFrame({ id, anchorRef: dialogRef });
   const [view, setView] = useState<ExampleView>('preview');
   const [zoom, setZoom] = useState<DeviceFrameZoom>('fit');
   const [scale, setScale] = useState(100);
@@ -158,9 +158,6 @@ export default function PreviewWorkbench({ id, title, children }: PreviewWorkben
   const openAfterExpand = useRef(false);
   // Set by Back to Preview; the checked Preview radio takes focus after that render.
   const focusPreviewTab = useRef(false);
-  // Latest mode switch and mode for the document event listener below.
-  const presentRef = useRef<(modal: boolean) => void>(() => {});
-  const expandedRef = useRef(false);
   const wide = useMacbookWideViewport();
   const layout = previewWorkbenchLayout(frame.device, wide, zoom);
   const profile = previewProfileForDevice(frame.device);
@@ -233,22 +230,6 @@ export default function PreviewWorkbench({ id, title, children }: PreviewWorkben
     );
   }, [view]);
 
-  // The Inspector's settings action asks this example to show its Preview.
-  useEffect(() => {
-    const show = (event: Event) => {
-      if ((event as CustomEvent<{ id?: unknown } | null>).detail?.id !== id) return;
-      setView('preview');
-      // The settings opener runs right after this event, so an expanded example leaves the
-      // top layer now and skips its focus return; the outer Tweaker stays reachable.
-      if (!expandedRef.current) return;
-      expandedRef.current = false;
-      presentRef.current(false);
-      returnFocus.current = false;
-    };
-    document.addEventListener('genux-preview-show', show);
-    return () => document.removeEventListener('genux-preview-show', show);
-  }, [id]);
-
   // showModal requires a closed dialog, so each switch closes first and suppresses that close.
   const present = (modal: boolean) => {
     const dialog = dialogRef.current;
@@ -268,10 +249,6 @@ export default function PreviewWorkbench({ id, title, children }: PreviewWorkben
     setExpanded(modal);
     if (!modal && !expanded) focusReturnTarget(dialog);
   };
-  useIsomorphicLayoutEffect(() => {
-    presentRef.current = present;
-    expandedRef.current = expanded;
-  });
 
   // The outer Tweaker lies outside an expanded example's top layer, so Expand closes first and
   // the Tweaker opens after that render; the demo subtree stays where it is.
@@ -416,15 +393,14 @@ export default function PreviewWorkbench({ id, title, children }: PreviewWorkben
                   },
                 ]}
               />
-              {layout.manualActual && (
-                <GenUXButton
-                  fill="outline"
-                  size="sm"
-                  text={t('Actual size 1:1')}
-                  aria-pressed={zoom === 'actual'}
-                  onClick={() => setZoom(zoom === 'fit' ? 'actual' : 'fit')}
-                />
-              )}
+              <GenUXButton
+                fill="outline"
+                size="sm"
+                text={t('Actual size 1:1')}
+                disabled={!layout.manualActual}
+                aria-pressed={layout.zoom === 'actual'}
+                onClick={() => setZoom(zoom === 'fit' ? 'actual' : 'fit')}
+              />
               {/* The compact GenUX switch is the focusable Grid control; its label toggles it too. */}
               <span className="example-preview-grid-switch">
                 <label htmlFor={gridSwitchId}>{t('Grid')}</label>

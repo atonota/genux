@@ -1,8 +1,9 @@
-/** Allowlist of the 41 documentation demos the isolated preview document renders. Module paths
-    and export names copy the component route's island sources; stylesheet lists copy its route
-    stylesheet rules in cascade order (Data workspace routes assume the splitter category rule).
-    Loaders stay dynamic, so a browser loads only the selected demo. Unknown ids fail the build. */
+/** Allowlist of the 41 documentation demos the isolated preview document renders. Island module,
+    export and route stylesheets come from the shared component route contract; this file only
+    adds the literal loaders. Loaders stay dynamic, so a browser loads only the selected demo.
+    Unknown ids fail the build. */
 import type { ComponentType } from 'react';
+import { componentRoutes } from '../data/component-routes';
 
 export type PreviewDemoProps = { documentation?: boolean };
 type DemoModule = Record<string, unknown>;
@@ -13,198 +14,61 @@ export type PreviewEntry = {
   readonly load: () => Promise<DemoModule>;
 };
 
-const entry = (
-  module: string,
-  load: () => Promise<DemoModule>,
-  exportName = 'default',
-  styles = '',
-): PreviewEntry => ({
-  source: `docs/src/react/${module}.tsx`,
-  exportName,
-  styles: styles ? styles.split(' ').map(name => `${name}.css`) : [],
-  load,
-});
-
-const dataEntry = 'data-entry-catalog';
-const selection = `${dataEntry} genux-selection-variants`;
-const feedback = 'genux-card genux-feedback';
-const workspace = 'genux-card genux-splitter';
-const kit = 'workspace-kit kit-forms-fixes';
-const collections = `${workspace} genux-avatar workspace workspace-collections ${kit} kit-identity`;
-
-export const previewRegistry: Readonly<Record<string, PreviewEntry>> = {
-  button: entry(
-    'ButtonDemo',
-    () => import('../react/ButtonDemo'),
-    'WebButtonDemo',
-    'button-catalog',
-  ),
-  input: entry('InputDemo', () => import('../react/InputDemo'), 'WebInputDemo', dataEntry),
-  select: entry('SelectDemo', () => import('../react/SelectDemo'), 'WebSelectDemo', dataEntry),
-  pill: entry('PillDemo', () => import('../react/PillDemo'), 'default', 'pill-catalog'),
-  card: entry('CardDemo', () => import('../react/CardDemo'), 'default', 'genux-card card-catalog'),
-  splitter: entry(
-    'SplitterDemo',
-    () => import('../react/SplitterDemo'),
-    'default',
-    'genux-splitter splitter-catalog',
-  ),
-  breadcrumb: entry(
-    'BreadcrumbDemo',
-    () => import('../react/BreadcrumbDemo'),
-    'default',
-    'genux-breadcrumb breadcrumb-catalog',
-  ),
-  pagination: entry(
-    'PaginationDemo',
-    () => import('../react/PaginationDemo'),
-    'default',
-    'genux-pagination pagination-catalog',
-  ),
-  steps: entry(
-    'StepsDemo',
-    () => import('../react/StepsDemo'),
-    'default',
-    'genux-steps steps-catalog',
-  ),
-  autocomplete: entry(
-    'AutoCompleteDemo',
-    () => import('../react/AutoCompleteDemo'),
-    'default',
-    'genux-autocomplete autocomplete-catalog',
-  ),
-  cascader: entry(
-    'CascaderDemo',
-    () => import('../react/CascaderDemo'),
-    'default',
-    'genux-cascader genux-listy cascader-catalog',
-  ),
-  dropdown: entry(
-    'DropdownDemo',
-    () => import('../react/DropdownDemo'),
-    'default',
-    'genux-dropdown dropdown-catalog',
-  ),
-  checkbox: entry(
-    'CheckboxDemo',
-    () => import('../react/CheckboxDemo'),
-    'WebCheckboxDemo',
-    selection,
-  ),
-  radio: entry('RadioDemo', () => import('../react/RadioDemo'), 'WebRadioDemo', selection),
-  switch: entry('SwitchDemo', () => import('../react/SwitchDemo'), 'WebSwitchDemo', selection),
-  slider: entry(
-    'SliderDemo',
-    () => import('../react/SliderDemo'),
-    'default',
-    `slider ${dataEntry}`,
-  ),
-  accordion: entry('AccordionDemo', () => import('../react/AccordionDemo')),
-  form: entry('FormDemo', () => import('../react/FormDemo'), 'default', dataEntry),
-  drawer: entry(
-    'DrawerDemo',
-    () => import('../react/DrawerDemo'),
-    'default',
-    'genux-drawer-extensions',
-  ),
-  'empty-state': entry(
-    'EmptyStateDemo',
-    () => import('../react/EmptyStateDemo'),
-    'default',
-    'genux-pagination kit-collections',
-  ),
-  avatar: entry('AvatarDemo', () => import('../react/AvatarDemo'), 'default', 'genux-avatar'),
-  toast: entry('FeedbackDemo', () => import('../react/FeedbackDemo'), 'ToastDemo', feedback),
-  alert: entry('FeedbackDemo', () => import('../react/FeedbackDemo'), 'AlertDemo', feedback),
-  notification: entry(
-    'FeedbackDemo',
-    () => import('../react/FeedbackDemo'),
-    'NotificationDemo',
-    feedback,
-  ),
-  modal: entry('FeedbackDemo', () => import('../react/FeedbackDemo'), 'ModalDemo', feedback),
-  popconfirm: entry(
-    'FeedbackDemo',
-    () => import('../react/FeedbackDemo'),
-    'PopconfirmDemo',
-    feedback,
-  ),
-  'date-time': entry(
-    'DateTimeDemo',
-    () => import('../react/DateTimeDemo'),
-    'default',
-    `${dataEntry} genux-date-time`,
-  ),
-  'data-table': entry(
-    'workspace/CollectionDemo',
-    () => import('../react/workspace/CollectionDemo'),
-    'DataTableDemo',
-    collections,
-  ),
-  'collection-views': entry(
-    'workspace/CollectionDemo',
-    () => import('../react/workspace/CollectionDemo'),
-    'default',
-    collections,
-  ),
-  'record-details': entry(
-    'workspace/RecordDetailsDemo',
-    () => import('../react/workspace/RecordDetailsDemo'),
-    'default',
-    `${workspace} workspace workspace-details ${kit}`,
-  ),
-  'record-forms': entry(
-    'workspace/RecordFormsDemo',
-    () => import('../react/workspace/RecordFormsDemo'),
-    'default',
-    `${workspace} workspace workspace-forms ${kit}`,
-  ),
-  'record-workspace': entry(
-    'workspace/kit/ConnectedWorkspace',
-    () => import('../react/workspace/kit/ConnectedWorkspace'),
-    'default',
-    `slider ${workspace} genux-pagination genux-avatar ${kit} workspace workspace-connected kit-collections kit-records kit-identity`,
-  ),
-  media: entry(
-    'MediaDemo',
-    () => import('../react/MediaDemo'),
-    'default',
-    'genux-media genux-screenshot',
-  ),
-  'content-patterns': entry(
-    'ContentPatternsDemo',
-    () => import('../react/ContentPatternsDemo'),
-    'default',
-    'genux-avatar genux-content-patterns',
-  ),
-  carousel: entry(
-    'CarouselDemo',
-    () => import('../react/CarouselDemo'),
-    'default',
-    'genux-media genux-carousel',
-  ),
-  upload: entry('UploadDemo', () => import('../react/UploadDemo'), 'default', 'genux-upload'),
-  'rich-menu': entry(
-    'RichMenuDemo',
-    () => import('../react/RichMenuDemo'),
-    'default',
-    'genux-dropdown genux-rich-menu',
-  ),
-  chart: entry('ChartDemo', () => import('../react/ChartDemo'), 'default', 'genux-chart'),
-  listy: entry(
-    'ListyDemo',
-    () => import('../react/ListyDemo'),
-    'default',
-    'genux-listy genux-selection-variants genux-avatar',
-  ),
-  badge: entry(
-    'BadgeDemo',
-    () => import('../react/BadgeDemo'),
-    'default',
-    'genux-avatar genux-badge',
-  ),
-  fab: entry('FabDemo', () => import('../react/FabDemo'), 'default', 'genux-badge genux-fab'),
+const loaders: Readonly<Record<string, () => Promise<DemoModule>>> = {
+  button: () => import('../react/ButtonDemo'),
+  input: () => import('../react/InputDemo'),
+  select: () => import('../react/SelectDemo'),
+  pill: () => import('../react/PillDemo'),
+  card: () => import('../react/CardDemo'),
+  splitter: () => import('../react/SplitterDemo'),
+  breadcrumb: () => import('../react/BreadcrumbDemo'),
+  pagination: () => import('../react/PaginationDemo'),
+  steps: () => import('../react/StepsDemo'),
+  autocomplete: () => import('../react/AutoCompleteDemo'),
+  cascader: () => import('../react/CascaderDemo'),
+  dropdown: () => import('../react/DropdownDemo'),
+  checkbox: () => import('../react/CheckboxDemo'),
+  radio: () => import('../react/RadioDemo'),
+  switch: () => import('../react/SwitchDemo'),
+  slider: () => import('../react/SliderDemo'),
+  accordion: () => import('../react/AccordionDemo'),
+  form: () => import('../react/FormDemo'),
+  drawer: () => import('../react/DrawerDemo'),
+  'empty-state': () => import('../react/EmptyStateDemo'),
+  avatar: () => import('../react/AvatarDemo'),
+  toast: () => import('../react/FeedbackDemo'),
+  alert: () => import('../react/FeedbackDemo'),
+  notification: () => import('../react/FeedbackDemo'),
+  modal: () => import('../react/FeedbackDemo'),
+  popconfirm: () => import('../react/FeedbackDemo'),
+  'date-time': () => import('../react/DateTimeDemo'),
+  'data-table': () => import('../react/workspace/CollectionDemo'),
+  'collection-views': () => import('../react/workspace/CollectionDemo'),
+  'record-details': () => import('../react/workspace/RecordDetailsDemo'),
+  'record-forms': () => import('../react/workspace/RecordFormsDemo'),
+  'record-workspace': () => import('../react/workspace/kit/ConnectedWorkspace'),
+  media: () => import('../react/MediaDemo'),
+  'content-patterns': () => import('../react/ContentPatternsDemo'),
+  carousel: () => import('../react/CarouselDemo'),
+  upload: () => import('../react/UploadDemo'),
+  'rich-menu': () => import('../react/RichMenuDemo'),
+  chart: () => import('../react/ChartDemo'),
+  listy: () => import('../react/ListyDemo'),
+  badge: () => import('../react/BadgeDemo'),
+  fab: () => import('../react/FabDemo'),
 };
+
+export const previewRegistry: Readonly<Record<string, PreviewEntry>> = Object.fromEntries(
+  Object.entries(loaders).map(([slug, load]) => {
+    const route = componentRoutes[slug];
+    if (!route) throw new Error(`Preview demo '${slug}' has no component route.`);
+    const { module, exportName, stylesheets } = route;
+    return [
+      slug,
+      { source: `docs/src/react/${module}.tsx`, exportName, styles: stylesheets, load },
+    ];
+  }),
+);
 
 // Delivery metadata and its usage helper live in the pure delivery-contract module, so the Code
 // view can use them without loading this allowlist; re-exported here for existing importers.

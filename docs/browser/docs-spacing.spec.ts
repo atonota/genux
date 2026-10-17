@@ -18,7 +18,6 @@ const stage = (process.env.GENUX_SOURCE_STAGE ?? 'unlabeled').replace(/[^a-z0-9-
 const tolerancePx = 0.5;
 const alignTolerancePx = 1;
 const minimumChromeInsetPx = 16;
-const minimumGridGapPx = 16;
 const minimumSectionGapPx = 24;
 
 const routes = [
@@ -263,67 +262,10 @@ async function expectSectionRhythm(page: Page, label: string) {
       .toBeGreaterThanOrEqual(minimumSectionGapPx - tolerancePx);
 }
 
-/** Component cards keep visible gaps, wrap inside the main content and add no border. */
-async function expectOverviewGrid(page: Page, mainEdge: Rect, inset: number, label: string) {
-  const cards = await page
-    .locator(`#component-library a[href^='/components/']`)
-    .evaluateAll(links =>
-      links.map(link => {
-        const rect = link.getBoundingClientRect();
-        const computed = getComputedStyle(link);
-        return {
-          left: rect.left,
-          right: rect.right,
-          top: rect.top,
-          bottom: rect.bottom,
-          border:
-            parseFloat(computed.borderTopWidth) +
-            parseFloat(computed.borderRightWidth) +
-            parseFloat(computed.borderBottomWidth) +
-            parseFloat(computed.borderLeftWidth),
-        };
-      }),
-    );
-  expect.soft(cards.length, `${label}: overview lists components`).toBeGreaterThan(1);
-  const rows: (typeof cards)[] = [];
-  for (const card of [...cards].sort((a, b) => a.top - b.top || a.left - b.left)) {
-    const row = rows.find(candidate => Math.abs(candidate[0].top - card.top) <= alignTolerancePx);
-    if (row) row.push(card);
-    else rows.push([card]);
-  }
-  rows.forEach((row, index) => {
-    row.sort((a, b) => a.left - b.left);
-    for (let column = 1; column < row.length; column++)
-      expect
-        .soft(
-          row[column].left - row[column - 1].right,
-          `${label}: grid column gap, row ${index + 1}`,
-        )
-        .toBeGreaterThanOrEqual(minimumGridGapPx - tolerancePx);
-    if (index > 0) {
-      const above = rows[index - 1];
-      const gap =
-        Math.min(...row.map(card => card.top)) - Math.max(...above.map(card => card.bottom));
-      expect
-        .soft(gap, `${label}: grid row gap before row ${index + 1}`)
-        .toBeGreaterThanOrEqual(minimumGridGapPx - tolerancePx);
-    }
-  });
-  cards.forEach((card, index) => {
-    expect
-      .soft(card.left, `${label}: card ${index + 1} starts inside the main content`)
-      .toBeGreaterThanOrEqual(mainEdge.left + inset - tolerancePx);
-    expect
-      .soft(card.right, `${label}: card ${index + 1} wraps inside the main content`)
-      .toBeLessThanOrEqual(mainEdge.right - inset + tolerancePx);
-    expect.soft(card.border, `${label}: card ${index + 1} adds no decorative border`).toBe(0);
-  });
-}
-
 async function expectOverviewLinks(page: Page, label: string) {
   const main = page.getByRole('main');
   const links = [
-    ['Explore components', '/components/button/'],
+    ['Explore components', '/components/'],
     ['Setup and usage', '/getting-started/'],
     ['Design tokens', '/tokens/'],
   ] as const;
@@ -345,12 +287,13 @@ test('docs spacing: shell regions inset their content and the overview keeps one
         await page.goto(new URL(route.path, testInfo.project.use.baseURL ?? fallbackBaseUrl).href);
         await applyMode(page, mode);
         await saveViewport(page, testInfo, `${route.name}-${viewport.name}-${mode}`);
-        const mainEdge = await expectMainPanel(page, viewport, label);
+        await expectMainPanel(page, viewport, label);
         await expectChromeInsets(page, label);
         await expectSharedContentEdge(page, label);
         await expectNoHorizontalOverflow(page, label);
         if (route.name !== 'overview') continue;
-        await expectOverviewGrid(page, mainEdge, viewport.mainInset, label);
+        await expect(page.locator('#component-library')).toHaveCount(0);
+        await expect(page.locator('a[href="#component-library"]')).toHaveCount(0);
         await expectSectionRhythm(page, label);
         await expectOverviewLinks(page, label);
         if (viewport.name === 'desktop') {

@@ -1,40 +1,38 @@
 ---
-// Concrete page tools: the published source of the catalog entry, repository edit and issue
-// links only when PUBLIC_GENUX_REPOSITORY_URL is configured, and copy as Markdown, which
-// docs-page.ts reveals once the clipboard is available.
-import { sourceHref } from '../pages/source/[...path].txt';
-import { repositoryBranch, repositoryUrl } from './docs-page';
-
+// Source always names this page's Astro source. Raw copies remain on the existing allowlist.
+import { sourceHref } from '../published-sources';
+import { repositoryBranch, repositoryUrl } from '../data/repository';
+import { logicalPath } from '../data/url-policy';
+import '../components/shell/page-tools.css';
 interface Props {
   placement: 'rail' | 'article';
+  sourcePath: string;
+  pageTitle: string;
 }
-const { placement } = Astro.props;
-const sourcePath = 'docs/src/data/catalog.ts';
-const source = sourceHref(sourcePath);
-const edit =
-  repositoryUrl && repositoryBranch
-    ? `${repositoryUrl}/edit/${repositoryBranch}/${sourcePath}`
-    : undefined;
+const { placement, sourcePath, pageTitle } = Astro.props;
+const source = sourceHref(sourcePath) ?? `${repositoryUrl}/blob/${repositoryBranch}/${sourcePath}`;
+const edit = `${repositoryUrl}/edit/${repositoryBranch}/${sourcePath}`;
+const pagePath = logicalPath(Astro.url.pathname, import.meta.env.BASE_URL);
+const issue = new URL(`${repositoryUrl}/issues/new`);
+issue.searchParams.set('title', `Documentation: ${pageTitle}`);
+issue.searchParams.set('body', `Page: ${pagePath}\nSource: ${sourcePath}\n\nDescribe the issue:\n`);
 ---
 
 <div class="docs-page-tools" data-doc-tools={placement}>
-  {source && (
-    <a href={source}>
-      <span data-i18n="View page source">View page source</span>
-    </a>
-  )}
-  {edit && (
-    <a href={edit}>
-      <span data-i18n="Edit this page">Edit this page</span>
-    </a>
-  )}
-  {repositoryUrl && (
-    <a href={`${repositoryUrl}/issues/new`}>
-      <span data-i18n="Report an issue">Report an issue</span>
-    </a>
-  )}
+  <p class="shell-tools-title" data-shell-i18n="Page actions">
+    Page actions
+  </p>
+  <a href={source}>
+    <span data-i18n="View page source">View page source</span>
+  </a>
+  <a href={edit}>
+    <span data-i18n="Edit this page">Edit this page</span>
+  </a>
+  <a href={issue.href}>
+    <span data-i18n="Report an issue">Report an issue</span>
+  </a>
   <button type="button" class="doc-choice" data-doc-copy-markdown hidden>
     <span data-i18n="Copy as Markdown">Copy as Markdown</span>
   </button>
-  <p role="status" data-doc-copy-status></p>
+  <p role="status" aria-atomic="true" data-doc-copy-status></p>
 </div>

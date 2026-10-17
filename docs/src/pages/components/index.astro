@@ -2,16 +2,7 @@
 import DocsLayout from '../../layouts/DocsLayout.astro';
 import DocumentationNav from '../../components/DocumentationNav.astro';
 import PageBreadcrumb from '../../components/shell/PageBreadcrumb.astro';
-import { components } from '../../data/catalog';
-const categories = [...new Set(components.map(item => item.category))].map(label => ({
-  label,
-  id:
-    'category-' +
-    label
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-|-$/g, ''),
-}));
+import { catalogGroups } from '../../data/component-navigation';
 ---
 
 <DocsLayout
@@ -25,8 +16,8 @@ const categories = [...new Set(components.map(item => item.category))].map(label
     Choose a component by the task it helps people complete. Each reference includes live examples,
     usage guidance, accessibility notes and its implementation API.
   </p>
-  <DocumentationNav items={categories} />
-  {categories.map(category => (
+  <DocumentationNav items={catalogGroups} />
+  {catalogGroups.map(category => (
     <section
       id={category.id}
       data-doc-section={category.id}
@@ -34,17 +25,15 @@ const categories = [...new Set(components.map(item => item.category))].map(label
     >
       <h2 id={`${category.id}-title`}>{category.label}</h2>
       <div class="component-index">
-        {components
-          .filter(item => item.category === category.label)
-          .map(item => (
-            <a class="component-link" href={`/components/${item.slug}/`}>
-              <h3>{item.title}</h3>
-              <p>{item.summary}</p>
-              <span class="component-cta">
-                Examples and API <span aria-hidden="true">→</span>
-              </span>
-            </a>
-          ))}
+        {category.components.map(item => (
+          <a class="component-link" href={`/components/${item.slug}/`}>
+            <h3>{item.title}</h3>
+            <p>{item.summary}</p>
+            <span class="component-cta">
+              Examples and API <span aria-hidden="true">→</span>
+            </span>
+          </a>
+        ))}
       </div>
     </section>
   ))}

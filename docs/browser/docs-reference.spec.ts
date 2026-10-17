@@ -313,7 +313,7 @@ test('Input preview renders inline with kept node, state, profile and delivery',
   const workspace = content.getByRole('textbox', { name: /workspace name/i });
   await expect(workspace).toBeEditable();
   await expectNoIframes();
-  // Before any preview radio, control or form focus, the Inspector's Component settings opens
+  // Before any preview radio, control or form focus, the right-edge Tweaker opens
   // the first example's Tweaker: a 3px corner edit lands on that preview's screen only, while
   // the shell, its saved recipe and the sibling preview keep theirs, and reset restores it.
   const builderKey = 'genux-theme-builder-v1';
@@ -370,25 +370,18 @@ test('Input preview renders inline with kept node, state, profile and delivery',
       Array.from((el as HTMLElement).style).filter(name => name.startsWith('--')),
     );
   const editors = page.locator('[data-theme-token-editors]');
-  const inspectorRecipe = await parentRecipe();
-  const inspectorShell = await shellTheme();
-  const inspectorScreen = await inlineTheme(screen);
-  const inspectorSibling = await inlineTheme(siblingScreen);
-  const inspector = page.locator('dialog[data-docs-inspector]');
-  await page
-    .locator('[aria-controls=docs-inspector]:not([data-docs-inspector-close])')
-    .first()
-    .click();
-  await expect(inspector).toBeVisible();
-  await expect(inspector.locator('[data-docs-inspector-focus]')).toBeVisible();
-  const settings = inspector.getByRole('button', { name: /^component settings$/i });
-  await expect(settings).toBeEnabled();
-  await settings.click();
+  const initialRecipe = await parentRecipe();
+  const initialShell = await shellTheme();
+  const initialScreen = await inlineTheme(screen);
+  const initialSibling = await inlineTheme(siblingScreen);
+  await expect(page.locator('[data-docs-inspector]')).toHaveCount(0);
+  await expect(page.getByRole('button', { name: /^open inspector$/i })).toHaveCount(0);
+  await page.locator('[data-tweaker-page-trigger] button').first().click();
   const corner = editors.getByRole('combobox', { name: /radius|corner/i }).first();
   await expect(corner).toBeVisible();
   await corner.click();
   await page.getByTitle('3px', { exact: true }).click();
-  await expect.poll(() => inlineTheme(screen)).not.toBe(inspectorScreen);
+  await expect.poll(() => inlineTheme(screen)).not.toBe(initialScreen);
   // Device geometry roles are not theme tokens; only the edited corner roles are judged.
   const cornerNames = await screen.evaluate(el => {
     const style = getComputedStyle(el);
@@ -402,26 +395,23 @@ test('Input preview renders inline with kept node, state, profile and delivery',
   expect(cornerNames).not.toEqual([]);
   const siblingCorners = await tokenValues(siblingScreen, cornerNames);
   const shellCorners = await tokenValues(page.locator('html'), cornerNames);
-  await test.info().attach('inspector-local-corner.json', {
+  await test.info().attach('tweaker-local-corner.json', {
     body: JSON.stringify({ cornerNames, siblingCorners, shellCorners }, null, 2),
     contentType: 'application/json',
   });
   expect(siblingCorners).not.toContain('3px');
   expect(shellCorners).not.toContain('3px');
-  expect(await inlineTheme(siblingScreen)).toBe(inspectorSibling);
-  expect(await shellTheme()).toBe(inspectorShell);
-  expect(await parentRecipe()).toBe(inspectorRecipe);
+  expect(await inlineTheme(siblingScreen)).toBe(initialSibling);
+  expect(await shellTheme()).toBe(initialShell);
+  expect(await parentRecipe()).toBe(initialRecipe);
   await editors.getByRole('button', { name: /reset theme/i }).click();
-  await expect.poll(() => inlineTheme(screen)).toBe(inspectorScreen);
+  await expect.poll(() => inlineTheme(screen)).toBe(initialScreen);
   expect(await tokenValues(screen, cornerNames)).toEqual(siblingCorners);
-  expect(await inlineTheme(siblingScreen)).toBe(inspectorSibling);
-  expect(await shellTheme()).toBe(inspectorShell);
-  expect(await parentRecipe()).toBe(inspectorRecipe);
+  expect(await inlineTheme(siblingScreen)).toBe(initialSibling);
+  expect(await shellTheme()).toBe(initialShell);
+  expect(await parentRecipe()).toBe(initialRecipe);
   await page.getByRole('button', { name: /close tweaker/i }).click();
   await expect(editors).toBeHidden();
-  if (await inspector.evaluate(dialog => (dialog as HTMLDialogElement).open))
-    await inspector.locator('[data-docs-inspector-close]').click();
-  await expect(inspector).toBeHidden();
   // A kept handle and an expando prove the same input element stays mounted throughout.
   const workspaceNode = await workspace.elementHandle();
   if (!workspaceNode) throw new Error('The Workspace name field is missing.');
@@ -830,6 +820,8 @@ test('Input preview renders inline with kept node, state, profile and delivery',
 
   // Actual size 1:1 and back to Fit only rescale the same node.
   const actual = preview.getByRole('button', { name: /actual size 1:1/i });
+  await expect(actual).toBeVisible();
+  await expect(actual).toBeEnabled();
   await expect(actual).toHaveAttribute('aria-pressed', 'false');
   await actual.click();
   await expect(actual).toHaveAttribute('aria-pressed', 'true');
@@ -875,6 +867,8 @@ test('Input preview renders inline with kept node, state, profile and delivery',
   // MacBook: the central 1440x900 (16:10) logical screen with a centered 1024 container and
   // 208px margins, read as layout lengths so the stage scale never changes them.
   await choose(preview, /macbook/i);
+  await expect(actual).toBeVisible();
+  await expect(actual).toBeDisabled();
   await expect(preview).toHaveAttribute('data-preview-profile', 'large');
   await expect.poll(logicalSize).toBe('1440x900');
   await expect(caption).toContainText('1440×900');

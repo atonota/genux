@@ -1,5 +1,53 @@
 # GenUX maintenance contract
 
+## Shell UX candidate — human scope 2026-10-18
+
+The serial shell UX task supersedes older appearance freezes only for the header,
+documentation navigation, Contents/page actions, previous/next and footer. Preserve the
+published component product, preview geometry/surfaces, URL/SEO policy, palette, central
+modality and motion. Shell-only `--shell-ui-*` roles live in
+`docs/src/components/shell/shell-tokens.css`; they must not redefine generic product roles.
+See `docs/SHELL-UX.md` for ownership, checks and remaining browser/QA limitations.
+Round 2 decisions: the header Getting started action is `.header-link` only and is not
+rendered below the 875px sidebar breakpoint (the Drawer owns that route); the shared
+footer links the validated repository; sidebar and Contents rail asides carry unique
+accessible names; rail titles use the shell emphasis weight. The Round 2 continuation
+makes `docs/src/data/component-navigation.ts` the single owner of the visible catalog
+order (previous/next follow the sidebar/catalog grouping) and keeps component article
+prose, links and controls clear of the fixed Tweaker tab below the contents rail in
+`layout.css`, with the live preview and device geometry unchanged. Candidate source is
+not acceptance, promotion, CI or publication evidence.
+
+## Documentation application architecture — architecture rounds 2026-10-17/18
+
+`docs/ARCHITECTURE.md` records module ownership, dependency direction and lifecycle
+contracts of the Astro documentation application after three infrastructure-only rounds
+(header slot in `DocsLayout`, extracted document/shell/navigation/code-copy controllers,
+shared repository metadata, component route contract, component page model and the
+published-source allowlist). Older entries that describe inline `DocsLayout` or `DocsShell`
+scripts are dated history of the same behavior. The published component product, decision
+record, guards, rendered markup, CSS ownership and URL/SEO policy are unchanged. See
+`docs/AGENTS.md` for the documentation-side entry; this is not evidence of browser, CI or
+live checks.
+
+## Documentation Inspector removed — human decision 2026-10-17
+
+The component-page Open inspector button and Inspector panel are removed, together
+with their template, controller, CSS, translations and preview control/focus events.
+Do not restore the panel during refactoring. Per-example device/theme/Grid controls,
+Alone and the existing right-edge Tweaker remain; Tweaker keeps its local preview
+registration. Record/workspace inspector components are unrelated and remain.
+
+## Permanent product identity — human decision 2026-10-17
+
+The only approved names are `genux` (slug), `GenUX` (code) and `Gen UX`
+(wordmark). This decision applies to product source, local paths, task templates,
+Temporal jobs, queues and automation metadata. The current decision record and
+its admission guard enforce the brand. Superseded product spellings must not be
+introduced by new proposals. Historical cleanup and runtime migration must be
+reported separately; modifying or deleting evidence never proves a release.
+All unrelated visual, geometry, focus, motion and security decisions remain.
+
 ## Transparent playground preview — human decision 2026-10-17
 
 Newest entry; it changes only the playground preview wrapper.
@@ -52,10 +100,9 @@ are unchanged.
 
 - The canonical local checkout is `/Users/w6x/Developer/genux`. For this task
   it overrides only the older keep-the-local-checkout exception.
-- The root moves the existing directory once. A temporary `genui` symlink may
-  keep running processes and private Temporal tooling working; it is a
-  compatibility link, not another checkout, and holds no duplicate source. The
-  old `button-atlas` link points directly to the canonical `genux` directory.
+- The only canonical checkout is `/Users/w6x/Developer/genux`. All new tools,
+  task templates and consumer paths use this directory. Compatibility links
+  are migration work and never an approved product identity.
 - Localhost keeps serving the same current files on port 4324. No user service
   restart, deletion, history, identity, license or visibility change; styles,
   geometry, focus, motion, Grid and Pages contracts are unchanged. Proposal,
@@ -67,10 +114,9 @@ Newest entry; it changes only the public repository and Pages destination.
 `docs/decisions/current.json`, its precedence and every other decision below
 are unchanged.
 
-- The human explicitly authorizes https://atonota.github.io/genux/ and the
-  rename of the existing public repository atonota/genui to atonota/genux. For
-  this task it overrides only the older keep-the-repository-address and
-  Pages-base exception.
+- The public destination is https://atonota.github.io/genux/ and the public
+  repository is https://github.com/atonota/genux. These are the canonical
+  addresses; all earlier keep-the-address exceptions are superseded.
 - Source uses https://github.com/atonota/genux and the Pages base `/genux`;
   the product route `/genux/` stays local and publishes as `/genux/genux/`
   through `genuxPageHref(import.meta.env.BASE_URL)`.
@@ -242,7 +288,7 @@ no check was run and no test was added in this source phase.
   from package.json (GenUX is not on npm), persisted as `genux-package-manager`.
   ApiReference splits joined identifier names; ambiguous types/defaults point
   to the official reference and keep the joined original.
-- PENDING: i18n dictionary entries, optional inspector, regression tests, build
+- PENDING: i18n dictionary entries, regression tests, build
   gate, tab focus marker, hash/keyboard browser checks and 320px overflow.
 
 ## Black dark documentation shell and canonical sidebar search — human task 2026-10-16
@@ -548,7 +594,7 @@ values; historical log/evidence paths naming Token standards stay labelled histo
   (Tooltip included, Toast/Notification excluded), central Cubic motion and shell
   role colors are unchanged. Preserve the eight component sections, the frozen 59
   packages and the pending live-host decision. The physical project is now GenUX
-  at `/Users/w6x/Developer/genui`; new content does not hardcode the repository path.
+  at `/Users/w6x/Developer/genux`; new content does not hardcode the repository path.
 - This entry records rules and ownership; it is not evidence of passing checks,
   rendering or human visual approval.
 
@@ -603,7 +649,7 @@ eight-section documentation order.
   well shadow is recorded and pending a future human decision. Dark-shell
   sidebar search measures fill contrast 1.07 and boundary 4.67; report only,
   not recolored.
-- Physical project: GenUX lives at `/Users/w6x/Developer/genui`, license MIT,
+- Physical project: GenUX lives at `/Users/w6x/Developer/genux`, license MIT,
   public repository `atonota/genux` with `main` initialized. Publication is
   proven only by Git remote ref verification recorded in the local delivery
   receipt; no future push is claimed.
@@ -1001,3 +1047,13 @@ Refactoring UI delivery acceptance remains **INCOMPLETE** after independent revi
 Neutral warm field palette (human decision applied 2026-10-15): `theme-builder/definitions.json` is the single central source for field `#ececec` / `#1b1b1b` (the earlier light `#ded9cc` is superseded by the consolidated role decision), border `#747166` / `#858585`, text `#242622` / `#f2f2f2` and muted `#575a53` / `#b8b8b8`; disabled roles keep their own `definitions.json` values, with disabled text equal to muted, so every text role keeps at least 4.5:1 and the field border at least 3:1 on field, panel and canvas. Panel and field surfaces are neutral greys with equal RGB channels in both modes; the warm shell canvas (`#e6e2d7` / `#191302`, R >= G >= B, no blue overshoot) is a separate role. Shell `#e6e2d7` / `#191302` and panels `#ffffff` / `#2c2c2c` follow the consolidated role decision; brand, status, motion, font, radius, shadow geometry and explicit custom recipes are unchanged. TDD exception for this regression: exactly one new node:test file with one scenario, `docs/tests/neutral-field-surfaces.test.mjs`, bundles the real theme, input-surface, accessibility, Theme Builder model and color-system modules with esbuild, fails against the former blue-grey sources and passes after the central change; no further test waves or fixtures are added for it.
 Decorative inset paint edge (human correction applied 2026-10-15; supersedes the earlier forced bright four-side field perimeter, which was a paint-role confusion and is not an approved look): the field well rests on the decorative `insetBorder` role from `inputSurfaces` (light neutral ink `rgba(26, 26, 26, 0.035)`, dark neutral white `rgba(255, 255, 255, 0.02)`), exposed as `--genux-input-inset-border` on the provider and as the `--field-inset-border`, `--field-inner-shadow` and `--field-inner-hover` root aliases from `theme.ts` for owners outside GenUXProvider such as the sidebar search. This edge is decorative and carries no 3:1 contrast claim; the functional `--field-border` token (`#747166` / `#858585`) and its 3:1 contract are unchanged for checkbox, radio and other functional boundaries. At rest every physical border width of a field equals `--field-border-width`: no reserved thick bottom stripe and no surrounding contrast frame. Focus paints exactly one immediate bottom-only marker (`--focus-marker` tall) as a background layer inside the well over the retained reference inner shadow, so geometry never shifts; no ring, glow or sidebar label underline doubles it. Text keeps at least 4.5:1 and focus/status cues at least 3:1; `definitions.json`, surfaces, sizes, radius and layout are unchanged.
 Overlay backdrop standard (permanent human decision applied 2026-10-15; standard and central implementation integrated; runtime acceptance and human visual approval tracked separately): every user-opened upper layer, meaning Dropdown, Select, AutoComplete, Cascader, DatePicker, TimePicker, range pickers, rich menus, Popconfirm, Popover, Drawer, Modal and the Tweaker, dims the page behind it with a neutral scrim and a fixed 1 px background blur. A non-modal panel and its bound trigger stay sharp above the scrim; Drawer and Modal blur the whole background including the trigger. Toast and Notification are excluded. Tooltip is included by the latest human decision: the scrim and blur apply only while a Tooltip is actually visible after hover or keyboard focus, its existing delay is preserved, and the Tooltip popup and its trigger stay sharp. Closing keeps the clip, stacking and trigger cut-out until the fade ends; the controller stays safe to import during SSR and paints through a single body pseudo-element. Native outside click, Escape, focus return, the 14 CSS px minimum and readability are preserved. `docs/src/theme-builder/definitions.json` is the single role source for the six `overlay` group tokens `overlay-scrim-color`, `overlay-scrim-opacity`, `overlay-backdrop-blur`, `overlay-scrim-z`, `overlay-trigger-z` and `overlay-popup-z` (black scrim in both themes, opacity 0.12 light / 0.24 dark, fixed 1px blur, base layers 1040 / 1041 / 1050), raising the catalog from 51 to 57 definitions; the helper, root and resolver in `docs/src/theme-builder/model.ts` and `docs/src/theme.ts` generate `--overlay-scrim` RGBA, `--overlay-backdrop-blur` and the z roles, and the documentation catalog is generated from `tokenDefinitions`, never hardcoded. Motion aliases `--overlay-open-duration: var(--press-duration)`, `--overlay-close-duration: var(--release-duration)` and `--overlay-easing: var(--motion-easing)` point at the central symmetric Cubic contract and introduce no new timing; reduced motion is instant. `--dropdown-scrim`, `--dropdown-backdrop-blur`, `--dropdown-backdrop-z` and `--dropdown-trigger-z` remain compatibility aliases only with no duplicated values. Existing modal caller z values are preserved and `layerOrder` metadata is not a universal claim. Theme Builder compatibility: a complete valid 51-token custom recipe stays valid, only the six new roles are filled from factory defaults, strict unknown/partial rejection, the storage key and version 1 are unchanged. New layered components MUST consume the semantic standard and MUST join the existing shared table in `docs/browser/drawer-feedback.spec.ts` with one row; no separate spec file or new wave. The rule is documented in `docs/src/pages/standards.astro` (`layers`, legacy anchor `overlay-standard`), its values in `docs/src/pages/tokens.astro`, and in `docs/UX-STANDARDS.md` (the former `token-standards.astro` location is history); this entry records the decision and is not evidence that runtime, browser scenarios or screenshots passed. The central helper `data/overlay-tokens.ts` and the controller `overlay-backdrop.ts` are the single runtime owners of the overlay roles; the one existing shared table in `docs/browser/drawer-feedback.spec.ts` is the only browser oracle and gains no separate spec file or case wave. The initial real RED is `overlay-backdrop-red-full.log`; the outcome record is `/Users/w6x/Developer/genux-temporal/evidence/overlay-backdrop-delivery-20261015.json`, written by the root conductor after the checks finish. Current runtime acceptance is recorded in the linked outcome receipt; this source documentation is not evidence of passing browser or CI checks or of human visual approval.
+
+## Current task scope — direct human correction 2026-10-17
+
+This task is product naming and migration only. The human objected to the prolonged
+test/review expansion. Do not start another test, review or infrastructure-design
+cycle for this migration. Preserve completed check evidence. Keep unrelated
+controller/security proposals as unaccepted candidates; do not activate them or
+claim them delivered. The only product names remain genux / GenUX / Gen UX.
+Do not interpret this scope correction as permission for irreversible history
+deletion or Keychain mutation; those explicit questions remain unanswered.

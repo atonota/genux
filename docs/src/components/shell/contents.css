@@ -1,0 +1,29 @@
+/* The rail belongs to the article surface, rather than a second shell-coloured box. */
+[data-docs-shell] .shell-contents {
+  background: transparent;
+  color: var(--shell-ui-reading-ink);
+  font-size: var(--shell-ui-text);
+  line-height: var(--shell-ui-line-height);
+}
+[data-docs-shell] .shell-contents-title {
+  font-weight: var(--shell-ui-emphasis);
+}
+[data-docs-shell] .shell-contents [data-shell-contents-list] {
+  display: grid;
+}
+[data-docs-shell] .shell-contents [data-shell-contents-list] a {
+  color: var(--shell-ui-reading-muted);
+  padding-block: var(--shell-ui-space-tight);
+  line-height: var(--shell-ui-line-height);
+}
+[data-docs-shell] .shell-contents [hidden] {
+  display: none;
+}
+@media (any-hover: hover) {
+  [data-docs-shell] .shell-contents a:hover {
+    color: var(--shell-ui-link);
+    background: transparent;
+    text-decoration: underline;
+    text-underline-offset: 0.25em;
+  }
+}

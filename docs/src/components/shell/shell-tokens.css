@@ -1,0 +1,26 @@
+/* Shell-only roles. Never redefine product --paper/--panel/--ink/--radius/--text here.
+   Nested components and device screens do not consume any --shell-ui-* role. */
+[data-docs-shell] {
+  --shell-ui-text: max(14px, var(--text));
+  --shell-ui-label: 500;
+  --shell-ui-emphasis: 600;
+  --shell-ui-brand-size: 24px;
+  --shell-ui-destination-size: max(16px, var(--text-large));
+  --shell-ui-line-height: 1.5;
+  --shell-ui-space-tight: var(--space-xs);
+  --shell-ui-space-control: var(--space-sm);
+  --shell-ui-space-group: var(--space-md);
+  --shell-ui-space-section: var(--space-lg);
+  --shell-ui-space-ending: var(--space-xl);
+  --shell-ui-target: max(48px, var(--target-min));
+  --shell-ui-radius: var(--radius);
+  --shell-ui-ink: var(--shell-ink);
+  --shell-ui-muted: color-mix(in srgb, var(--shell-ink) 82%, var(--shell-bg));
+  --shell-ui-reading-ink: var(--panel-ink);
+  --shell-ui-reading-muted: color-mix(in srgb, var(--panel-ink) 82%, var(--panel-bg));
+  --shell-ui-hover: var(--surface);
+  --shell-ui-action: var(--docs-brand-primary);
+  --shell-ui-action-ink: var(--docs-brand-on-primary);
+  --shell-ui-link: var(--accent);
+  --shell-ui-rule: var(--line);
+}

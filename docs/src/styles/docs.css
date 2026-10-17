@@ -196,11 +196,6 @@ button:disabled {
 .docs-action:hover {
   opacity: var(--opacity-hover);
 }
-.overview-intro p {
-  margin-top: var(--space-xs);
-  max-inline-size: var(--prose-measure, 65ch);
-  color: var(--muted);
-}
 .component-index {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -219,10 +214,6 @@ button:disabled {
 }
 .component-link:hover {
   background: var(--soft);
-}
-.component-number {
-  color: var(--muted);
-  font-family: var(--font-code);
 }
 .component-link p {
   color: var(--muted);

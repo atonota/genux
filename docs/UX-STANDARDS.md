@@ -2,16 +2,13 @@
 
 ## GenUX public destination — 17 October 2026
 
-Newest human decision; it changes only the public repository, Pages
-destination and local root path, not any presentation, color, type, motion or
-focus rule below. The human authorizes https://atonota.github.io/genux/ and
-renaming atonota/genui to atonota/genux, overriding the older keep-the-address
-exception for this task only. The product route `/genux/` stays local and
-publishes as `/genux/genux/`. Per the newest human decision the canonical local
-root is `/Users/w6x/Developer/genux`; the physical move is complete and `genui`
-is only a temporary compatibility symlink to the same checkout. Repository
-rename, push, CI and live results remain PENDING as of this source authoring;
-this source document is not a receipt.
+The canonical public repository is https://github.com/atonota/genux and the
+Pages destination is https://atonota.github.io/genux/. The canonical checkout
+is `/Users/w6x/Developer/genux`. Product identity is permanently `genux`,
+`GenUX` and `Gen UX`. The product route `/genux/` stays local and publishes
+as `/genux/genux/` on Pages. Compatibility cleanup, push, CI and live delivery
+are separately verified states; this source document is not a release receipt.
+No presentation, color, type, motion or focus decision changes here.
 
 ## Normal-laptop component detail presentation — 16 October 2026
 
@@ -695,7 +692,7 @@ passed history above and the eight documentation sections are unchanged.
 - Open, non-blocking: the old slot-marker and well-shadow review finding awaits
   a future human decision. Dark-shell sidebar search measures fill contrast 1.07
   and boundary 4.67; report only, not recolored.
-- Physical project: `/Users/w6x/Developer/genui`, MIT, public `atonota/genux`,
+- Physical project: `/Users/w6x/Developer/genux`, MIT, public `atonota/genux`,
   `main` initialized; the first push is PENDING and is not claimed.
 - Color roles: [definitions.json](src/theme-builder/definitions.json) is the
   single color source for shell `#e6e2d7` / `#191302`, the entire main panel

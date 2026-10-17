@@ -1,0 +1,21 @@
+---
+import manifest from '../../../../package.json';
+import { repositoryUrl } from '../../data/repository';
+// One compact ending for component articles and guide pages, with no product version fiction.
+// The validated repository destination lives here so it stays reachable below the 1280px
+// header links at every width.
+const version = manifest.version.split('.').slice(0, 2).join('.');
+---
+
+<footer class="shell-footer">
+  <a class="shell-footer-brand" href="/" aria-label="GenUX home" data-i18n-aria-label="GenUX home">
+    Gen UX
+  </a>
+  <span>
+    <span data-i18n="Version">Version</span> {version} · Flat 2.0
+  </span>
+  <a href={repositoryUrl}>GitHub</a>
+  <a href="/licenses/">
+    <span data-i18n="Third-party licenses">Third-party licenses</span>
+  </a>
+</footer>

@@ -5,6 +5,12 @@ import { isDeepStrictEqual } from 'node:util';
 import postcss from 'postcss';
 import selectorParser from 'postcss-selector-parser';
 import ts from 'typescript';
+import {
+  PRODUCT_BRAND,
+  isProtectedProductPath,
+  isHistoricalProductArtifact,
+  productBrandViolations,
+} from './product-brand.mjs';
 
 // Read-only admission guard for the direct human decision record. Only the root records human
 // decisions; author proposals can never edit the record or this guard. Facts come from parsed
@@ -12,7 +18,6 @@ import ts from 'typescript';
 // executed and nothing is written.
 export const DECISION_PATH = 'docs/decisions/current.json';
 export const GUARD_PATH = 'tools/docs-decisions.mjs';
-const PROTECTED_PATHS = new Set([DECISION_PATH, GUARD_PATH]);
 const SOURCE_ROOT = 'docs/src';
 const SOURCES = Object.freeze({
   devices: 'docs/src/data/preview-devices.ts',
@@ -141,7 +146,7 @@ function candidateMap(files) {
   for (const file of files) {
     const path = candidatePath(file?.path);
     if (map.has(path)) fail('duplicate-path', `Candidate path ${path} appears more than once.`);
-    if (PROTECTED_PATHS.has(path))
+    if (isProtectedProductPath(path))
       fail('protected-path', `${path} is recorded by the root only; proposals cannot edit it.`);
     if (typeof file.content !== 'string')
       fail('invalid-proposal', `Candidate ${path} must carry full text content.`);
@@ -199,7 +204,7 @@ async function proposalFiles(root, proposal) {
   const edits = new Map();
   for (const item of replacements) {
     const path = candidatePath(item?.path);
-    if (PROTECTED_PATHS.has(path))
+    if (isProtectedProductPath(path))
       fail('protected-path', `${path} is recorded by the root only; proposals cannot edit it.`);
     if (created.has(path))
       fail('duplicate-path', `${path} is both a new file and a replacement target.`);
@@ -248,6 +253,7 @@ async function sourceFiles(root, overlay) {
 }
 
 const CHECKS = [
+  ['product-brand', checkProductBrand],
   ['macbook', checkMacbook],
   ['fixed-screen', checkFixedScreen],
   ['preview-devices', checkPreviewDevices],
@@ -261,10 +267,85 @@ const CHECKS = [
   ['inline-preview', checkInlinePreview],
 ];
 
+// Maintained product/orchestration sources only; generated output, dependencies and historical
+// evidence/state are deliberately excluded and reported by the separate migration inventory.
+const BRAND_ROOTS = [
+  'src',
+  'tools',
+  'docs/src',
+  'docs/browser',
+  'docs/tests',
+  '.github',
+  '.storybook',
+  'storybook',
+  'tests',
+  'runtime',
+  'plans',
+  'evidence',
+  'state',
+];
+const BRAND_TEXT =
+  /\.(?:[cm]?[jt]sx?|astro|mdx?|html|svg|jsonl?|ya?ml|toml|css|s[ac]ss|less|sh|py|txt|xml|csv)$/i;
+async function brandSourceFiles(root, overlay) {
+  const files = new Set([...overlay.keys()].filter(path => !isHistoricalProductArtifact(path)));
+  for (const folder of BRAND_ROOTS) {
+    let entries;
+    try {
+      entries = await readdir(resolve(root, folder), { recursive: true, withFileTypes: true });
+    } catch (error) {
+      if (error.code === 'ENOENT') continue;
+      throw error;
+    }
+    for (const entry of entries)
+      if (entry.isFile()) {
+        const path = relative(root, resolve(entry.parentPath, entry.name)).split(sep).join('/');
+        if (
+          !path
+            .split('/')
+            .some(part => ['node_modules', '.git', '.astro', '.cache'].includes(part)) &&
+          BRAND_TEXT.test(path) &&
+          !isHistoricalProductArtifact(path)
+        )
+          files.add(path);
+      }
+  }
+  for (const folder of ['', 'docs']) {
+    let entries;
+    try {
+      entries = await readdir(resolve(root, folder), { withFileTypes: true });
+    } catch (error) {
+      if (error.code === 'ENOENT') continue;
+      throw error;
+    }
+    for (const entry of entries)
+      if (entry.isFile() && BRAND_TEXT.test(entry.name)) files.add(posix.join(folder, entry.name));
+  }
+  return [...files].sort();
+}
+// The same filesystem collector used by admission; exported for a read-only discovery probe.
+export async function findProductBrandViolations(root) {
+  const violations = [];
+  for (const path of await brandSourceFiles(root, new Map()))
+    violations.push(...productBrandViolations(path, await readSource(root, path)));
+  return violations;
+}
+
+async function checkProductBrand({ facts, brandFiles, read }) {
+  if (!isDeepStrictEqual(facts.productBrand, PRODUCT_BRAND))
+    return ['The permanent product identity must remain genux / GenUX / Gen UX.'];
+  const violations = [];
+  const manifest = JSON.parse(await read('package.json'));
+  if (manifest.name !== PRODUCT_BRAND.slug)
+    violations.push('package.json must use the approved product slug.');
+  for (const path of brandFiles) violations.push(...productBrandViolations(path, await read(path)));
+  return violations;
+}
+
 async function verify(root, snapshot, overlay) {
   const context = {
     facts: snapshot.record.facts,
     files: await sourceFiles(root, overlay),
+    brandFiles: await brandSourceFiles(root, overlay),
     read: async path => (overlay.has(path) ? overlay.get(path) : readSource(root, path)),
   };
   const violations = [];

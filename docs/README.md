@@ -50,6 +50,9 @@ existing 16px/rem behavior; historical reports and global policies are unchanged
 
 ## Source boundaries
 
+Application infrastructure (layout, shell, controllers, route contracts and the
+published-source allowlist) is mapped in [ARCHITECTURE.md](ARCHITECTURE.md).
+
 | Source                                | Responsibility                                                                       |
 | ------------------------------------- | ------------------------------------------------------------------------------------ |
 | `src/data/catalog.ts`                 | English technical guidance, API reference and typechecked TSX examples               |
@@ -63,6 +66,8 @@ existing 16px/rem behavior; historical reports and global policies are unchanged
 | `src/locales/tr/`                     | Lazy-loaded Turkish dictionaries for docs, React and legacy content                  |
 | `src/ssr/styles.ts`                   | Per-page cache and SSR style extraction during build                                 |
 | `src/styles/`                         | Semantic tokens, responsive documentation shell and shared component styles          |
+| `src/layouts/`, `src/components/`     | Layout, shell and controllers; see [ARCHITECTURE.md](ARCHITECTURE.md)                |
+| `src/published-sources.ts`            | Allowlist of published source copies served by `src/pages/source/` and page links    |
 | `src/pages/`                          | Static Astro routes with content, live examples, code and API tables                 |
 | `tests/`                              | Behavior and generated page/asset contracts                                          |
 

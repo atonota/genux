@@ -1,12 +1,8 @@
 ---
 import DocsLayout from '../layouts/DocsLayout.astro';
 import DocumentationNav from '../components/DocumentationNav.astro';
-import { components } from '../data/catalog';
 import { genuxPageHref } from '../data/foundation-navigation';
-const sections = [
-  { id: 'component-library', label: 'Component library' },
-  { id: 'shared-foundation', label: 'Shared foundation' },
-];
+const sections = [{ id: 'shared-foundation', label: 'Shared foundation' }];
 // Each foundation page owns its values; the overview only links to it.
 const foundations = [
   {
@@ -68,40 +64,6 @@ const foundations = [
     </a>
   </div>
   <DocumentationNav items={sections} />
-  <section
-    id="component-library"
-    data-doc-section="component-library"
-    aria-labelledby="component-library-title"
-  >
-    <div class="overview-intro">
-      <h2 id="component-library-title">
-        <span data-i18n="Component library">Component library</span>
-      </h2>
-      <p>
-        <span data-i18n="From basic controls to form flows. Every example uses shared tokens.">
-          From basic controls to form flows. Every example uses shared tokens.
-        </span>
-      </p>
-    </div>
-    <div class="component-index">
-      {components
-        .filter(item => ['button', 'input', 'select', 'card', 'drawer', 'fab'].includes(item.slug))
-        .map((item, index) => (
-          <a href={'/components/' + item.slug + '/'} class="component-link">
-            <span class="component-number">{String(index + 1).padStart(2, '0')}</span>
-            <h3 data-i18n={item.title}>{item.title}</h3>
-            <p data-i18n={item.summary}>{item.summary}</p>
-            <span class="component-cta">
-              <span data-i18n="Examples and API">Examples and API</span>{' '}
-              <span aria-hidden="true">→</span>
-            </span>
-          </a>
-        ))}
-    </div>
-    <p>
-      <a href="/components/">Browse the complete component catalog</a>
-    </p>
-  </section>
   <section
     id="shared-foundation"
     class="foundation-strip"

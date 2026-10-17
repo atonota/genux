@@ -1,5 +1,5 @@
 ---
-import { components } from '../../data/catalog';
+import { catalogGroups } from '../../data/component-navigation';
 import { foundationGroups, genuxPageHref } from '../../data/foundation-navigation';
 import genux from '../../data/genux.json';
 import { inputPaddingInline, inputSurfaceAliasVariables } from '../../data/input-surfaces';
@@ -10,7 +10,6 @@ interface Props {
 }
 
 const { slug } = Astro.props;
-const groups = [...new Set(components.map(component => component.category))];
 // The product guide keeps one canonical path under either hosting base.
 const genuxHref = genuxPageHref(import.meta.env.BASE_URL);
 
@@ -30,7 +29,7 @@ const searchFrameStyle: Record<string, string> = {
 ---
 
 <div class="navigation" id="navigation" data-nosnippet>
-  <h2 class="navigation-title">
+  <h2 class="navigation-title" id="docs-navigation-title">
     <span data-i18n="Component library">Component library</span>
   </h2>
   <nav aria-label="Documentation" data-i18n-aria-label="Documentation">
@@ -47,12 +46,26 @@ const searchFrameStyle: Record<string, string> = {
           type="search"
           id="component-search"
           class="genux-input-native"
-          placeholder="Button, Input, Drawer…"
-          data-i18n-placeholder="Button, Input, Drawer…"
+          placeholder="Search"
+          data-i18n-placeholder="Search"
           autocomplete="off"
         />
       </span>
     </label>
+    <div class="nav-search-feedback">
+      <p id="search-status" role="status" hidden>
+        <span data-i18n="No results found.">No results found.</span>
+      </p>
+      <button
+        type="button"
+        class="nav-search-clear"
+        data-docs-search-clear
+        data-shell-i18n="Clear search"
+        hidden
+      >
+        Clear search
+      </button>
+    </div>
     <div class="nav-scroll" data-docs-nav-scroll>
       {foundationGroups.map(group => (
         <section class="nav-group">
@@ -71,29 +84,24 @@ const searchFrameStyle: Record<string, string> = {
           </ul>
         </section>
       ))}
-      {groups.map(group => (
+      {catalogGroups.map(group => (
         <section class="nav-group">
-          <h2 data-i18n={group}>{group}</h2>
+          <h2 data-i18n={group.label}>{group.label}</h2>
           <ul>
-            {components
-              .filter(item => item.category === group)
-              .map(item => (
-                <li data-component-link={item.title + ' ' + item.slug}>
-                  <a
-                    href={'/components/' + item.slug + '/'}
-                    aria-current={slug === item.slug ? 'page' : undefined}
-                    data-i18n={item.title}
-                  >
-                    {item.title}
-                  </a>
-                </li>
-              ))}
+            {group.components.map(item => (
+              <li data-component-link={item.title + ' ' + item.slug}>
+                <a
+                  href={'/components/' + item.slug + '/'}
+                  aria-current={slug === item.slug ? 'page' : undefined}
+                  data-i18n={item.title}
+                >
+                  {item.title}
+                </a>
+              </li>
+            ))}
           </ul>
         </section>
       ))}
-      <p id="search-status" role="status" hidden>
-        <span data-i18n="No results found.">No results found.</span>
-      </p>
     </div>
   </nav>
 </div>

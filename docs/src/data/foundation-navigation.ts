@@ -55,3 +55,11 @@ export function findFoundation(
 export function genuxPageHref(base = '/'): string {
   return routeHref('genux', base);
 }
+
+/** Astro's matched file route, shared by source/edit tools; dynamic pages name their template. */
+export function shellPageSource(routePattern: string | undefined): string {
+  const route = (routePattern ?? '/').replace(/\/$/, '') || '/';
+  return route === '/'
+    ? 'docs/src/pages/index.astro'
+    : `docs/src/pages${route}${route === '/components' ? '/index' : ''}.astro`;
+}

@@ -4,116 +4,41 @@
  *
  * DOM placement shared with installDocsShell (./docs-shell) and ./layout.css:
  * - `[data-docs-shell]` is the root and paints the default shell surface.
+ * - The `header` slot places the page header first inside the root. DocsLayout supplies it, next
+ *   to the controller that drives its theme and language controls.
  * - `button[data-docs-menu-toggle]` sits in the header and controls the drawer.
  * - `dialog#docs-navigation-drawer[data-docs-drawer]` is the first child of the `.docs-shell`
  *   grid. In SSR it only holds `[data-docs-drawer-header]` with `[data-docs-menu-close]` and an
  *   empty `[data-docs-drawer-body]`; it has no `open` attribute, so it takes no grid slot.
  * - The single `aside.sidebar` (navigation and note) follows the dialog, before `main#content`,
  *   rendered once and never duplicated. Without the helper it stays inline; the helper moves it
- *   into the Drawer body below the sidebar breakpoint and back to its place above it.
+ *   into the Drawer body below the sidebar breakpoint and back to its place above it. It is
+ *   named by the visible DocsNav title, so the two complementary landmarks (sidebar and
+ *   Contents rail) stay distinct for assistive technology.
  * - Component detail pages (the components/[slug] catalog route) mark the root with
  *   `data-docs-component-page` and skip the global footer; their article renders its own.
  * - `button[data-docs-search]` and Cmd/Ctrl+K focus the canonical sidebar `#component-search`,
  *   opening the Drawer through the menu toggle when the sidebar lives there.
  */
-import GenUXIcon from '../../react/GenUXIcon';
 import DocsNav from './DocsNav.astro';
-import { genuxPageHref } from '../../data/foundation-navigation';
-import { repositoryUrl } from '../docs-page';
+import './shell-tokens.css';
 import './shell.css';
+import ShellFooter from './ShellFooter.astro';
+import ContentsRail from './ContentsRail.astro';
+import DocsPageTools from '../DocsPageTools.astro';
 import './layout.css';
 interface Props {
   slug?: string;
+  title: string;
+  sourcePath: string;
 }
-const { slug = '' } = Astro.props;
+const { slug = '', title, sourcePath } = Astro.props;
 // Server-only: the components/[slug] route renders one page per catalog component.
 const componentPage = Boolean(slug) && Astro.routePattern === '/components/[slug]';
 ---
 
 <div class="docs-root" data-docs-shell data-docs-component-page={componentPage ? '' : undefined}>
-  <header class="docs-header">
-    <button
-      type="button"
-      class="docs-menu-toggle"
-      data-docs-menu-toggle
-      aria-controls="docs-navigation-drawer"
-      aria-expanded="false"
-    >
-      <span data-i18n="Menu">Menu</span>
-    </button>
-    <a class="wordmark" href="/" aria-label="GenUX home" data-i18n-aria-label="GenUX home">
-      Gen<span>UX</span>
-    </a>
-    <button
-      type="button"
-      class="docs-search-trigger"
-      data-docs-search
-      aria-keyshortcuts="Meta+K Control+K"
-      aria-label="Search documentation"
-      data-i18n-aria-label="Search documentation"
-    >
-      <span data-i18n="Search">Search</span>
-      <kbd aria-hidden="true">⌘/Ctrl K</kbd>
-    </button>
-    <span class="header-meta">Flat 2.0 · Ant Design 6.6.6</span>
-    <div class="locale-controls" role="group" aria-label="Language" data-i18n-aria-label="Language">
-      <button
-        type="button"
-        class="locale-option"
-        data-locale-button="en"
-        aria-pressed="true"
-        aria-label="EN · English"
-        data-i18n-aria-label="EN · English"
-      >
-        EN
-      </button>
-      <button
-        type="button"
-        class="locale-option"
-        data-locale-button="tr"
-        aria-pressed="false"
-        aria-label="TR · Turkish"
-        data-i18n-aria-label="TR · Turkish"
-      >
-        TR
-      </button>
-    </div>
-    <button
-      type="button"
-      class="theme-toggle"
-      data-theme-toggle
-      role="switch"
-      aria-label="Dark theme"
-      data-i18n-aria-label="Dark theme"
-      aria-checked="false"
-    >
-      <span class="theme-toggle-thumb genux-motion-layer" aria-hidden="true"></span>
-      <span class="theme-toggle-icon" aria-hidden="true">
-        <GenUXIcon name="sun" />
-      </span>
-      <span class="theme-toggle-icon" aria-hidden="true">
-        <GenUXIcon name="moon" />
-      </span>
-    </button>
-    <script is:inline data-theme-control-bootstrap>
-      document
-        .querySelector('[data-theme-toggle]')
-        ?.setAttribute('aria-checked', String(document.documentElement.dataset.theme === 'dark'));
-    </script>
-    <nav class="header-primary" aria-label="Primary" data-i18n-aria-label="Primary">
-      <a href="/components/">
-        <span data-i18n="Components">Components</span>
-      </a>
-      <a href={genuxPageHref(import.meta.env.BASE_URL)}>GenUX</a>
-      <a href="/theme-builder/">
-        <span data-i18n="Theme Builder">Theme Builder</span>
-      </a>
-      <a href={repositoryUrl}>GitHub</a>
-    </nav>
-    <a class="header-link" href="/getting-started/">
-      <span data-i18n="Getting started">Getting started</span>
-    </a>
-  </header>
+  <slot name="header" />
   <p class="locale-status" data-locale-status role="status" hidden></p>
   <div class="docs-shell">
     <dialog
@@ -130,7 +55,7 @@ const componentPage = Boolean(slug) && Astro.routePattern === '/components/[slug
       </div>
       <div data-docs-drawer-body></div>
     </dialog>
-    <aside class="sidebar">
+    <aside class="sidebar" aria-labelledby="docs-navigation-title">
       <DocsNav slug={slug} />
       <p class="sidebar-note">
         <span data-i18n="One language, shared tokens.">One language, shared tokens.</span>
@@ -141,79 +66,29 @@ const componentPage = Boolean(slug) && Astro.routePattern === '/components/[slug
       </p>
     </aside>
     <main id="content" class="docs-main" tabindex="-1">
-      <slot />
+      {componentPage ? (
+        <slot />
+      ) : (
+        <div class="page-grid" data-docs-guide-grid>
+          <article class="docs-article" data-doc-article>
+            <slot />
+            <DocsPageTools placement="article" sourcePath={sourcePath} pageTitle={title} />
+            <ShellFooter />
+          </article>
+          <ContentsRail guide sourcePath={sourcePath} pageTitle={title} />
+        </div>
+      )}
     </main>
   </div>
-  {!componentPage && (
-    <footer class="docs-footer">
-      <span data-i18n="GenUX · Technical component documentation">
-        GenUX · Technical component documentation
-      </span>
-      <a href="/licenses/">
-        <span data-i18n="Third-party licenses">Third-party licenses</span>
-      </a>
-    </footer>
-  )}
 </div>
 
 <script>
   import { installDocsShell } from './docs-shell';
+  import { installDocsShellControls } from './shell-controls';
 
+  import { installGuideContents } from './contents';
+
+  installGuideContents(document);
   installDocsShell(document);
-
-  // Search documentation: the header button and Cmd/Ctrl+K focus the canonical sidebar search.
-  // Below the breakpoint the sidebar lives in the closed Drawer, which the menu toggle opens.
-  // One listener set per document; pagehide removes it and a restored page reinstalls it.
-  const focusSearch = () => {
-    const input = document.getElementById('component-search');
-    if (!input) return;
-    const drawer = input.closest('dialog');
-    if (drawer && !drawer.open)
-      document.querySelector<HTMLButtonElement>('[data-docs-menu-toggle]')?.click();
-    input.focus();
-  };
-  const installSearch = () => {
-    const controller = new AbortController();
-    const { signal } = controller;
-    document
-      .querySelector('[data-docs-search]')
-      ?.addEventListener('click', focusSearch, { signal });
-    document.addEventListener(
-      'keydown',
-      event => {
-        if (event.defaultPrevented || event.isComposing || event.altKey || event.shiftKey) return;
-        if (!(event.metaKey || event.ctrlKey) || event.key.toLowerCase() !== 'k') return;
-        event.preventDefault();
-        focusSearch();
-      },
-      { signal },
-    );
-    return () => controller.abort();
-  };
-  // The single owner of --docs-header-height: the sticky header's actual, possibly wrapped
-  // height, read by the sticky rails and section scroll margins in the shell CSS.
-  const installHeaderHeight = () => {
-    const header = document.querySelector<HTMLElement>('[data-docs-shell] .docs-header');
-    const style = document.documentElement.style;
-    if (!header || typeof ResizeObserver === 'undefined') return () => {};
-    const observer = new ResizeObserver(() => {
-      style.setProperty('--docs-header-height', `${header.getBoundingClientRect().height}px`);
-    });
-    observer.observe(header);
-    return () => {
-      observer.disconnect();
-      style.removeProperty('--docs-header-height');
-    };
-  };
-  const install = () => {
-    const disposers = [installSearch(), installHeaderHeight()];
-    return () => disposers.forEach(dispose => dispose());
-  };
-  let disposeShell = install();
-  window.addEventListener('pagehide', () => disposeShell());
-  window.addEventListener('pageshow', event => {
-    if (!event.persisted) return;
-    disposeShell();
-    disposeShell = install();
-  });
+  installDocsShellControls(document);
 </script>

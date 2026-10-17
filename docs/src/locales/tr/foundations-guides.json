@@ -8,7 +8,6 @@
   "Explore components": "Bileşenleri keşfet",
   "Setup and usage": "Kurulum ve kullanım",
   "Component library": "Bileşen kitaplığı",
-  "From basic controls to form flows. Every example uses shared tokens.": "Temel kontrollerden form akışlarına. Her örnek ortak tokenları kullanır.",
   "Examples and API": "Örnekler ve API",
   "Shared foundation": "Ortak temel",
   "Every component builds on five foundation pages; each page owns its own values.": "Her bileşen beş temel sayfaya dayanır; her sayfa kendi değerlerinin sahibidir.",

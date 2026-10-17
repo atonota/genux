@@ -5,7 +5,7 @@ import {
   collectPreviewCode,
   publishablePreviewText,
 } from '../../../../tools/docs-preview-code.mjs';
-import { sourceHref } from '../source/[...path].txt';
+import { sourceHref } from '../../published-sources';
 import {
   previewDeliveryContracts,
   previewDeliveryUsage,

@@ -1,5 +1,63 @@
 # Astro documentation maintenance contract
 
+## Shell UX candidate — human scope 2026-10-18
+
+The serial shell UX task supersedes older appearance freezes only for the header,
+documentation navigation, Contents/page actions, previous/next and footer. Preserve the
+published component product, preview geometry/surfaces, URL/SEO policy, palette, central
+modality and motion. Shell-only `--shell-ui-*` roles live in
+`src/components/shell/shell-tokens.css`; they must not redefine generic product roles.
+See `SHELL-UX.md` for ownership, checks and remaining browser/QA limitations.
+Round 2 decisions: the header Getting started action is `.header-link` only and is not
+rendered below the 875px sidebar breakpoint (the Drawer's Start group owns that route);
+the shared footer links the validated repository; the sidebar and Contents rail asides
+carry unique accessible names; rail titles use the shell emphasis weight. The Round 2
+continuation makes `src/data/component-navigation.ts` the single owner of the visible
+catalog order, so previous/next follow the sidebar/catalog grouping, and `layout.css`
+keeps component article prose, links and controls clear of the fixed Tweaker tab below
+the contents rail while the live preview keeps the full column. Candidate source is not
+acceptance, promotion, CI or publication evidence.
+
+## Documentation application architecture — architecture rounds 2026-10-17/18
+
+[ARCHITECTURE.md](ARCHITECTURE.md) records module ownership, dependency direction and
+lifecycle contracts of the Astro documentation application after three
+infrastructure-only rounds. The page header markup is supplied by
+`src/layouts/DocsLayout.astro` through the shell's `header` slot; the document, shell,
+navigation filter, code copy and component-page controllers live in the modules that file
+names; repository metadata, the component route contract, the component page model and the
+published-source allowlist (`src/published-sources.ts`) are shared non-route modules, and
+no module outside `src/pages` imports a route. Older entries below that describe inline
+`DocsLayout` or `DocsShell` scripts, the "DocsLayout filter" or an unchanged shell header
+are dated history of the same behavior. Rendered markup, CSS ownership, URL/SEO policy,
+the published component product and every human product decision below are unchanged.
+Coverage: `tests/document-controllers.test.mjs` (1 case) and
+`tests/documentation-architecture.test.mjs` (1 case). This entry is not evidence of
+browser, CI or live checks.
+
+## Actual size control stays visible — human decision 2026-10-17
+
+The preview toolbar always renders Actual size 1:1 in Preview view. When manual
+zoom is unavailable, use the native disabled state instead of removing the button.
+The pressed state reflects the effective zoom; the existing MacBook automatic
+Fit/1:1 viewport rule and other devices' manual toggle remain unchanged.
+
+## Documentation Inspector removed — human decision 2026-10-17
+
+The component-page Open inspector button and Inspector panel are removed, together
+with their template, controller, CSS, translations and preview control/focus events.
+Do not restore the panel during refactoring. Per-example device/theme/Grid controls,
+Alone and the existing right-edge Tweaker remain; Tweaker keeps its local preview
+registration. Record/workspace inspector components are unrelated and remain.
+
+## Overview component library removed — human decision 2026-10-17
+
+The overview has no featured Component library section, numbered component cards
+or section-navigation entry for it. Do not restore them during architectural work.
+The intro catalog link, dedicated `/components/` catalog, component detail pages
+and Shared foundation section remain. Shared catalog styles retain their consumers;
+overview-only styles and translations are removed.
+
 ## Unified preview controls — human decision 2026-10-17
 
 - Device, theme, Grid, Rotate, Expand, Alone and Preview/Code form one centered
@@ -25,6 +83,16 @@
   dialog, closing Expand before opening the existing settings drawer.
 - Preserve the screen surfaces, Grid switch, device geometry, state and focus
   contracts. Do not restore the obsolete component-page CSS that hid the tab.
+
+## Permanent product identity — human decision 2026-10-17
+
+The only approved names are `genux` (slug), `GenUX` (code) and `Gen UX`
+(wordmark). This decision applies to product source, local paths, task templates,
+Temporal jobs, queues and automation metadata. The current decision record and
+its admission guard enforce the brand. Superseded product spellings must not be
+introduced by new proposals. Historical cleanup and runtime migration must be
+reported separately; modifying or deleting evidence never proves a release.
+All unrelated visual, geometry, focus, motion and security decisions remain.
 
 ## Transparent playground preview — human decision 2026-10-17
 
@@ -78,10 +146,9 @@ unchanged.
 
 - The canonical local checkout is `/Users/w6x/Developer/genux`. For this task
   it overrides only the older keep-the-local-checkout exception.
-- The root moves the existing directory once. A temporary `genui` symlink may
-  keep running processes and private Temporal tooling working; it is a
-  compatibility link, not another checkout, and holds no duplicate source. The
-  old `button-atlas` link points directly to the canonical `genux` directory.
+- The only canonical checkout is `/Users/w6x/Developer/genux`. All new tools,
+  task templates and consumer paths use this directory. Compatibility links
+  are migration work and never an approved product identity.
 - Localhost keeps serving the same current files on port 4324. No user service
   restart, deletion, history, identity, license or visibility change; styles,
   geometry, focus, motion, Grid and Pages contracts are unchanged. Proposal,
@@ -93,10 +160,9 @@ Newest entry; it changes only the public repository and Pages destination.
 `decisions/current.json`, its precedence and every other entry below are
 unchanged.
 
-- The human explicitly authorizes https://atonota.github.io/genux/ and the
-  rename of the public repository atonota/genui to atonota/genux; for this task
-  it overrides only the older keep-the-repository-address and Pages-base
-  exception.
+- The public destination is https://atonota.github.io/genux/ and the public
+  repository is https://github.com/atonota/genux. These are the canonical
+  addresses; all earlier keep-the-address exceptions are superseded.
 - The Pages base is `/genux`. GenUX product links use `genuxPageHref` from
   [foundation navigation](src/data/foundation-navigation.ts) with
   `import.meta.env.BASE_URL`: `/genux/` locally, `/genux/genux/` on Pages, so
@@ -367,7 +433,7 @@ Results are PENDING: no check was run and no test was added.
 - DocsPageTools, DocsInstall (package.json versions, GenUX not on npm) and the
   ApiReference one-property-per-row split are new; repository links render only
   with `PUBLIC_GENUX_REPOSITORY_URL`.
-- PENDING: translations, inspector, tests, build gate and browser checks.
+- PENDING: translations, tests, build gate and browser checks.
 
 ## Black dark documentation shell and canonical sidebar search — human task 2026-10-16
 
@@ -661,7 +727,7 @@ historical log/evidence paths keep their old names as history.
 - Focus, overlay (Tooltip in, Toast/Notification out), central Cubic motion, shell
   role colors, the eight component sections, the frozen 59 packages and the pending
   live-host decision are unchanged. The physical project is now GenUX at
-  `/Users/w6x/Developer/genui`; new content does not hardcode the repository path.
+  `/Users/w6x/Developer/genux`; new content does not hardcode the repository path.
   Not evidence of passing checks or rendering.
 
 ## Consolidated standards update — human instruction 2026-10-15
@@ -710,7 +776,7 @@ history and the eight documentation sections stay.
 - Open, non-blocking: the old slot-marker and well-shadow review finding is
   recorded, pending a future human decision. Dark-shell sidebar search measures
   fill contrast 1.07 and boundary 4.67; report only, not recolored.
-- Physical project: `/Users/w6x/Developer/genui`, MIT, public `atonota/genux`,
+- Physical project: `/Users/w6x/Developer/genux`, MIT, public `atonota/genux`,
   `main` initialized. Publication is proven only by Git remote ref verification
   recorded in the local delivery receipt; no future push is claimed.
 - Color roles supersede the earlier pale `#fffefa` / `#ded9cc` and dark `#242424`

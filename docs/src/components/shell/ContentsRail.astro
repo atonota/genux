@@ -1,0 +1,32 @@
+---
+import DocsPageTools from '../DocsPageTools.astro';
+import './contents.css';
+interface Props {
+  items?: readonly { id: string; label: string }[];
+  sourcePath: string;
+  pageTitle: string;
+  guide?: boolean;
+}
+const { items = [], sourcePath, pageTitle, guide = false } = Astro.props;
+---
+
+<aside
+  class="toc shell-contents"
+  data-doc-nav="toc"
+  aria-label="On this page"
+  data-i18n-aria-label="On this page"
+>
+  <nav aria-label="Contents" data-i18n-aria-label="Contents" data-shell-contents-nav hidden={guide}>
+    <p class="shell-contents-title">
+      <span data-i18n="Contents">Contents</span>
+    </p>
+    <div data-shell-contents-list>
+      {items.map(item => (
+        <a href={'#' + item.id}>
+          <span data-i18n={item.label}>{item.label}</span>
+        </a>
+      ))}
+    </div>
+  </nav>
+  <DocsPageTools placement="rail" sourcePath={sourcePath} pageTitle={pageTitle} />
+</aside>

@@ -7,12 +7,9 @@ identifiers, fonts and vendor provenance are preserved.
 
 ## Run and verify
 
-The canonical local checkout is `/Users/w6x/Developer/genux`; new scripts should
-use the `genux` path. The local move is complete: `/Users/w6x/Developer/genui` is
-only a temporary compatibility symlink to the same checkout, not a duplicate, so
-existing local services and workflows keep running. Agent orchestration
-(workflow workers, run evidence and reports) lives in a separate local project
-and is not part of this repository.
+The canonical local checkout is `/Users/w6x/Developer/genux`; all scripts use
+this path. Product identity is permanently `genux`, `GenUX` and `Gen UX`.
+Agent orchestration lives in a separate local project and is not part of this repository.
 
 Use the pinned dependencies and a supported Node version (`^24.15.0 || >=26.0.0`).
 The current environment uses Node 24.21.0.

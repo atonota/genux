@@ -10,12 +10,30 @@
     "chromatic": {
       "package": "@ant-design/colors",
       "version": "8.0.1",
-      "localPackageJson": "/Users/w6x/Developer/genui-saas-panel/node_modules/@ant-design/colors/package.json",
-      "localGeneratedPaletteFile": "/Users/w6x/Developer/genui-saas-panel/node_modules/@ant-design/colors/es/presets.js",
+      "localPackageJson": "/Users/w6x/Developer/genux/node_modules/@ant-design/colors/package.json",
+      "localGeneratedPaletteFile": "/Users/w6x/Developer/genux/node_modules/@ant-design/colors/es/presets.js",
       "localGeneratedPaletteFileSha256": "86560ae243c9760ba6bbffa3e5184c21fcdd9aa1f245d42a7b4a61444409ee97",
       "officialVersionPinnedGeneratorUrl": "https://github.com/ant-design/ant-design-colors/blob/%40ant-design%2Fcolors%408.0.1/generate-presets.ts",
       "officialVersionPinnedGeneratorAlgorithmUrl": "https://github.com/ant-design/ant-design-colors/blob/%40ant-design%2Fcolors%408.0.1/src/generate.ts",
-      "verifiedFrom": "Read installed generated palette arrays; no package installation or package execution."
+      "verifiedFrom": "Historical generated arrays acquisition; current local file paths were reverified separately by byte digest. No package was installed or executed.",
+      "currentCopyVerification": {
+        "kind": "equivalent-current-copy-verification",
+        "verifiedAt": "2026-10-17T11:52:43Z",
+        "packageVersion": "8.0.1",
+        "files": [
+          {
+            "path": "/Users/w6x/Developer/genux/node_modules/@ant-design/colors/package.json",
+            "sha256": "4c3af6bffa7f19b5c2eb4f94ab0c7df5aaec61b3c075b54150bdc2881cabe447"
+          },
+          {
+            "path": "/Users/w6x/Developer/genux/node_modules/@ant-design/colors/es/presets.js",
+            "sha256": "86560ae243c9760ba6bbffa3e5184c21fcdd9aa1f245d42a7b4a61444409ee97"
+          }
+        ],
+        "originalAcquisitionRecordSha256": "efd81e6c278ebf96c1ed0be1b043fcc049cc90ddf0e68a24fe83bf4f5b93ac39",
+        "originalAcquisitionRecord": "/Users/w6x/Developer/genux-migration/tone-original-acquisition.json",
+        "note": "Original acquisition bytes are preserved unchanged in the private historical record. Current paths identify separately verified equivalent installed files, not the original acquisition checkout."
+      }
     },
     "neutral": {
       "repository": "ant-design/ant-design",

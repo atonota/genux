@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "revision": "human-2026-10-17-locked-preview-surface",
+  "revision": "human-2026-10-17-product-brand",
   "authority": "Direct human conversation decisions; new human decisions supersede only the explicitly changed fields. Proposal authors cannot edit this record.",
   "sources": {
     "preview": "Latest user: inner content1024; earlier logicalMacBook1440 and proportionally shrink below1920;200px rails.",
@@ -8,7 +8,8 @@
     "typography": "Latest user AGENTS instructions: Outfit and minimum14 CSSpx; supersedes older project12px entry.",
     "adaptive": "Original human task320/600/960/1280/1920; inner480/768/1600;2560+, explicitTV andTab.",
     "inlinePreview": "Latest direct human: iframe is forbidden; components render on-page in device mockups; all components adapt to phone,tablet,computer,tv.",
-    "previewScreenSurface": "Latest direct human: every device screen is white in light mode and #222222 in dark mode; other shell, recipe or component changes must not alter this surface."
+    "previewScreenSurface": "Latest direct human: every device screen is white in light mode and #222222 in dark mode; other shell, recipe or component changes must not alter this surface.",
+    "productBrand": "Direct human decision: product identity is permanently genux / GenUX / Gen UX across source, orchestration, task templates and data."
   },
   "facts": {
     "macbook": {
@@ -27,29 +28,12 @@
     },
     "radius": {
       "default": "5px",
-      "options": [
-        "0px",
-        "3px",
-        "5px",
-        "100%"
-      ]
+      "options": ["0px", "3px", "5px", "100%"]
     },
     "sizes": {
-      "regular": [
-        48,
-        56,
-        64
-      ],
-      "compact": [
-        32,
-        40,
-        48
-      ],
-      "badge": [
-        20,
-        26,
-        32
-      ]
+      "regular": [48, 56, 64],
+      "compact": [32, 40, 48],
+      "badge": [20, 26, 32]
     },
     "palette": {
       "primary": {
@@ -137,32 +121,20 @@
       },
       "shortHeight": 480,
       "verificationWidths": [
-        320,
-        375,
-        430,
-        480,
-        599,
-        600,
-        768,
-        959,
-        960,
-        1279,
-        1280,
-        1600,
-        1920,
-        2560
+        320, 375, 430, 480, 599, 600, 768, 959, 960, 1279, 1280, 1600, 1920, 2560
       ]
     },
     "previewRendering": "inline-components",
-    "supportedSurfaces": [
-      "phone",
-      "tablet",
-      "computer",
-      "tv"
-    ],
+    "supportedSurfaces": ["phone", "tablet", "computer", "tv"],
     "previewScreenSurface": {
       "light": "#ffffff",
       "dark": "#222222"
+    },
+    "productBrand": {
+      "slug": "genux",
+      "code": "GenUX",
+      "wordmark": "Gen UX",
+      "immutable": true
     }
   }
 }

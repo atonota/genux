@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { readFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
 import { resolve } from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
@@ -10,7 +11,9 @@ import {
   assertDecisionAdmission,
   captureDecisionSnapshot,
   checkCurrentDecisions,
+  findProductBrandViolations,
 } from '../../tools/docs-decisions.mjs';
+import { productBrandViolations } from '../../tools/product-brand.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const DEVICES = 'docs/src/data/preview-devices.ts';
@@ -26,6 +29,96 @@ test('decision admission keeps the current human facts and never writes', async 
   assert.equal(snapshot.path, DECISION_PATH);
   assert.equal(snapshot.digest, sha(await read(DECISION_PATH)));
   const fresh = { decisionDigest: snapshot.digest };
+
+  // Product identity is a direct human decision, including new source paths and identifiers.
+  const retiredPrefix = String.fromCharCode(65, 116, 108, 97, 115);
+  await assert.rejects(
+    checkCurrentDecisions(root, [
+      {
+        path: 'docs/src/data/brand-regression.ts',
+        content: `export const ${retiredPrefix}Product = 'example';`,
+      },
+    ]),
+    { code: 'decision-conflict', message: /product-brand/ },
+  );
+
+  assert.deepEqual(
+    productBrandViolations(
+      'src/provenance.ts',
+      `ingenuity; GENUINE; oxygen-ui; MongoDB ${retiredPrefix}; texture-${retiredPrefix.toLowerCase()}`,
+    ),
+    [],
+  );
+  await checkCurrentDecisions(root, [
+    {
+      path: 'evidence/proposals/genux-feature-20261017-docs-eca-regression-core-99.json',
+      content: JSON.stringify({ before: retiredPrefix }),
+    },
+  ]);
+
+  for (const path of ['src/brand-regression.mdx', 'runtime/brand-regression.yaml']) {
+    await assert.rejects(
+      checkCurrentDecisions(root, [{ path, content: `title: ${retiredPrefix}` }]),
+      { code: 'decision-conflict', message: /product-brand/ },
+    );
+  }
+
+  const retiredCode = String.fromCharCode(71, 101, 110, 85, 73);
+  for (const label of [
+    retiredCode.slice(0, 3) + ' ' + retiredCode.slice(3),
+    retiredCode.toLowerCase(),
+  ])
+    assert.notEqual(productBrandViolations('src/brand-label.ts', label).length, 0);
+  for (const identifier of [`${retiredCode}NewComponent`, `${retiredCode.toLowerCase()}Next`]) {
+    await assert.rejects(
+      checkCurrentDecisions(root, [
+        { path: 'src/brand-identifier.ts', content: `export const ${identifier} = 1;` },
+      ]),
+      { code: 'decision-conflict', message: /product-brand/ },
+    );
+  }
+  for (const path of [
+    'Docs/Decisions/Current.JSON',
+    'tools/Docs-Decisions.mjs',
+    'tools/Product-Brand.mjs',
+  ]) {
+    await assert.rejects(
+      checkCurrentDecisions(root, [{ path, content: 'export const changed = true;' }]),
+      { code: 'protected-path' },
+    );
+  }
+
+  // Discovery must inspect actual MDX/YAML files without a proposed-file overlay.
+  const fixture = await mkdtemp(resolve(tmpdir(), 'genux-brand-discovery-'));
+  try {
+    const entries = [
+      ['src/brand.mdx', `# ${retiredPrefix} component`],
+      ['evidence/reintroduced.mjs', `export const ${retiredPrefix}Thing = 1;`],
+      ['state/reintroduced.ts', `export const ${retiredPrefix}Thing = 1;`],
+      ['evidence/active-workflow.json', JSON.stringify({ template: retiredPrefix })],
+      [
+        'evidence/proposals/genux-feature-20261017-docs-eca-regression-core-99.json',
+        JSON.stringify({ before: retiredPrefix }),
+      ],
+      ['runtime/brand.yaml', `title: ${retiredCode}`],
+      ['src/ordinary.ts', '// A genuine improvement works genuinely.'],
+    ];
+    for (const [path, content] of entries) {
+      await mkdir(resolve(fixture, path, '..'), { recursive: true });
+      await writeFile(resolve(fixture, path), content);
+    }
+    assert.deepEqual(await findProductBrandViolations(fixture), [
+      'evidence/active-workflow.json: retired product name in source content.',
+      'evidence/reintroduced.mjs: retired product name in source content.',
+      'runtime/brand.yaml: retired product name in source content.',
+      'src/brand.mdx: retired product name in source content.',
+      'state/reintroduced.ts: retired product name in source content.',
+    ]);
+    for (const [path, content] of entries)
+      assert.equal(await readFile(resolve(fixture, path), 'utf8'), content);
+  } finally {
+    await rm(fixture, { recursive: true, force: true });
+  }
 
   // The device canvas is a human-locked role, independent of editable shell/panel recipes.
   const previewPaintPath = 'docs/src/styles/preview-document.css';
