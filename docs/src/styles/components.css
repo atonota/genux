@@ -1008,7 +1008,9 @@ body .ant-modal-root .ant-modal-mask.ant-fade-leave-active {
   justify-content: center;
   gap: 0;
 }
-.genux-demo .genux-pill-checkable:has(.genux-pill-label:empty) > :last-child {
+/* Keep the relational match on the label wrapper, rather than a featureless descendant
+   subject that broadens Chromium style invalidation during preview measurements. */
+.genux-demo .genux-pill-checkable > :last-child:has(.genux-pill-label:empty) {
   margin-inline-start: 0;
 }
 .genux-demo .genux-pill-checkable[aria-disabled='true'] {

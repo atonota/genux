@@ -176,9 +176,13 @@ body[data-genux-surface='docs'] .genux-demo .genux-button {
 .live-preview .genux-demo .ant-radio-wrapper-disabled {
   --radio-selected-color: var(--ant-radio-dot-color-disabled);
 }
-/* Selection keeps its own underline color; keyboard focus scales the radio in
-   focus-fields.css. */
-.live-preview .genux-demo .ant-radio-wrapper:has(input:checked) > span:last-child {
+/* Keep the label subject explicit to bound relational style invalidation. :where()
+   preserves the former specificity, so selection-card underline overrides still win.
+   Keyboard focus scales the radio in focus-fields.css. */
+.live-preview
+  :where(.genux-demo)
+  .ant-radio-wrapper:has(input:checked)
+  > span:last-child.ant-radio-label {
   text-decoration-line: underline;
   text-decoration-color: var(--radio-selected-color);
   text-decoration-thickness: var(--focus-marker);
