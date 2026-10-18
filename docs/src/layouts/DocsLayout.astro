@@ -28,8 +28,15 @@ interface Props {
   description: string;
   slug?: string;
   noindex?: boolean;
+  sourcePath?: string;
 }
-const { title, description, slug = '', noindex = false } = Astro.props;
+const {
+  title,
+  description,
+  slug = '',
+  noindex = false,
+  sourcePath = shellPageSource(Astro.routePattern),
+} = Astro.props;
 const seo = noindex
   ? undefined
   : buildSeo({
@@ -103,7 +110,7 @@ const seo = noindex
     <a class="skip-link" href="#content">
       <span data-i18n="Skip to content">Skip to content</span>
     </a>
-    <DocsShell slug={slug} title={title} sourcePath={shellPageSource(Astro.routePattern)}>
+    <DocsShell slug={slug} title={title} sourcePath={sourcePath}>
       <Fragment slot="header">
         <header class="docs-header">
           <button

@@ -119,20 +119,142 @@
     padding: var(--space-lg);
   }
 }
-/* Tabs and package managers share one choice button; selection reuses the pressed locale
-   paint and stays separate from the keyboard focus marker. */
+/* Outer documentation tabs keep their own navigation and selected state. */
 .doc-tabs {
   display: flex;
+  align-items: center;
   gap: var(--space-xs);
   margin-block: var(--space-lg) 0;
   overflow-x: auto;
 }
-.docs-install-managers {
+/* Retains the supplied command surface. Its header contains ONE branded headless picker;
+   the listbox is a command variant, never another documentation tab row. */
+.docs-install-command {
+  margin-block: var(--shell-ui-space-group) 0;
+  border-radius: var(--shell-ui-radius);
+  background: var(--shell-ui-hover);
+  min-inline-size: 0;
+}
+.docs-install-command pre {
+  margin: 0;
+  padding: var(--shell-ui-space-control) var(--shell-ui-space-group);
+}
+.docs-install-picker {
+  position: relative;
+  padding: var(--shell-ui-space-tight) var(--shell-ui-space-group);
+  border-block-end: 1px solid var(--shell-ui-rule);
+  font-size: var(--shell-ui-text);
+}
+.docs-install-control {
   display: flex;
+  align-items: center;
+  justify-content: space-between;
   flex-wrap: wrap;
-  gap: var(--space-xs);
+  gap: var(--shell-ui-space-tight) var(--shell-ui-space-control);
+}
+.docs-install-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--shell-ui-space-control);
+  min-block-size: var(--shell-ui-target);
+  padding: var(--shell-ui-space-tight) var(--shell-ui-space-control);
+  border: 0;
+  border-radius: var(--shell-ui-radius);
+  background: var(--field-bg);
+  color: var(--shell-ui-reading-ink);
+  font: inherit;
+}
+.docs-install-chevron {
+  transition: transform var(--transition-duration) var(--motion-easing);
+}
+.docs-install-trigger[data-state='open'] .docs-install-chevron {
+  transform: rotate(180deg);
+}
+.docs-install-positioner {
+  z-index: var(--shell-ui-popup-layer);
+}
+/* Keyboard focus only: the combobox trigger is a field, so it takes the field treatment of
+   focus-fields.css rather than the inverted button fill: the focus surface plus one bottom marker
+   painted as a background layer. background-image, -size and -position are outside the shared eased
+   paint list, so the marker is visible on the first focused frame while the surface eases and the
+   value keeps the reading ink (AGENT.md: focus marks are immediate, never faded). Nothing surrounds. */
+:root[data-input-modality='keyboard']
+  .docs-install-command
+  .docs-install-picker
+  .docs-install-trigger:focus-visible {
+  background-color: var(--focus-bg);
+  background-image: linear-gradient(var(--focus-indicator-color), var(--focus-indicator-color));
+  background-position: bottom;
+  background-size: 100% var(--field-focus-indicator-width);
+  background-repeat: no-repeat;
+  color: var(--shell-ui-reading-ink);
+}
+/* The engine owns the listbox's hidden state and focuses it on open. Presentation moves the list one
+   tight space on the block axis both ways (the Drawer contract in shell/layout.css); display is a
+   discrete exit transition, so the closed list leaves after its motion while an opening list is
+   rendered, fully opaque and focusable from its first frame: the highlighted option's start-edge
+   marker is visible at once. An opacity fade would hide that marker under the parent on entry and a
+   transitioned visibility would refuse keyboard focus, so neither is used. */
+.docs-install-options {
+  display: block;
+  min-inline-size: var(--shell-ui-picker-width);
+  margin: 0;
+  padding: var(--shell-ui-space-tight);
+  list-style: none;
+  border-radius: var(--shell-ui-radius);
+  background: var(--panel-bg);
+  color: var(--shell-ui-reading-ink);
+  box-shadow: var(--shell-ui-popup-shadow);
+  translate: 0 calc(-1 * var(--shell-ui-space-tight));
+  transition:
+    translate var(--transition-duration) var(--motion-easing),
+    display var(--transition-duration) var(--motion-easing);
+  transition-behavior: allow-discrete;
+}
+.docs-install-options[hidden] {
+  display: none;
+}
+.docs-install-options[data-state='open'] {
+  translate: 0 0;
+}
+@starting-style {
+  .docs-install-options[data-state='open'] {
+    translate: 0 calc(-1 * var(--shell-ui-space-tight));
+  }
+}
+.docs-install-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--shell-ui-space-control);
+  min-block-size: var(--shell-ui-target);
+  margin: 0;
+  padding: var(--shell-ui-space-tight) var(--shell-ui-space-control);
+  cursor: pointer;
+  transition: background-color var(--transition-duration) var(--motion-easing);
+}
+.docs-install-option[data-highlighted] {
+  background: var(--shell-ui-hover);
+}
+.docs-install-selected {
+  visibility: hidden;
+  font-weight: var(--shell-ui-label);
+}
+.docs-install-option[data-state='checked'] .docs-install-selected {
+  visibility: visible;
+}
+@media (prefers-reduced-motion: reduce) {
+  .docs-install-options,
+  .docs-install-option,
+  .docs-install-chevron {
+    transition: none;
+  }
 }
 .doc-choice {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   flex: none;
   min-block-size: var(--target-min);
   padding-inline: var(--space-md);
@@ -152,7 +274,7 @@
   }
 }
 /* Script-applied hidden states win over the display rules above and in layout.css. */
-:is(.doc-tabs, .docs-install-managers, .docs-page-tools > *)[hidden],
+:is(.doc-tabs, .docs-install-picker, .docs-page-tools > *)[hidden],
 [data-docs-shell] :is([data-doc-panel], .page-grid [data-doc-nav] a)[hidden] {
   display: none;
 }
@@ -186,4 +308,12 @@
     --docs-preview-bleed: calc(var(--docs-article-inset, 0px) + var(--space-lg));
     padding-inline: var(--space-lg);
   }
+}
+/* Zag focuses the listbox and uses aria-activedescendant. Its highlighted child therefore
+   consumes the central keyboard marker while the real listbox has :focus-visible. */
+:root[data-input-modality='keyboard']
+  .docs-install-options:focus-visible
+  .docs-install-option[data-highlighted] {
+  background: var(--focus-bg);
+  box-shadow: inset var(--focus-indicator-width) 0 0 0 var(--focus-indicator-color);
 }

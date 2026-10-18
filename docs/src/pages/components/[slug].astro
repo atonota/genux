@@ -1,5 +1,6 @@
 ---
 import DocsLayout from '../../layouts/DocsLayout.astro';
+import { componentTemplates } from '../../templates/registry';
 import CodeExample from '../../components/CodeExample.astro';
 import ApiReference from '../../components/ApiReference.astro';
 import DocumentationNav from '../../components/DocumentationNav.astro';
@@ -115,6 +116,9 @@ export function getStaticPaths() {
   return components.map(component => ({ params: { slug: component.slug }, props: { component } }));
 }
 const { component } = Astro.props;
+const page = componentTemplates[component.slug];
+if (!page) throw new Error(`Missing TSX documentation template for ${component.slug}`);
+const Template = page.Template;
 const demos = {
   button: ButtonDemo,
   input: InputDemo,
@@ -227,7 +231,12 @@ const resourceGroups = componentResourceGroups(component.slug);
 const { previous: previousComponent, next: nextComponent } = catalogNeighbors(component.slug);
 ---
 
-<DocsLayout title={component.title} description={component.summary} slug={component.slug}>
+<DocsLayout
+  title={page.title}
+  description={page.description}
+  slug={component.slug}
+  sourcePath={page.sourcePath}
+>
   <Fragment slot="head">
     <Fragment set:html={ssrStyles} />
     {routeSheets.map(sheet => (
@@ -240,10 +249,7 @@ const { previous: previousComponent, next: nextComponent } = catalogNeighbors(co
         items={[{ label: 'Components', href: '/components/' }, { label: component.category }]}
         current={component.title}
       />
-      <h1 data-i18n={component.title}>{component.title}</h1>
-      <p class="lead" data-i18n={component.summary}>
-        {component.summary}
-      </p>
+      <Template part="introduction" />
       <div class="component-meta">
         <span>Ant Design · {component.antdComponent}</span>
         <a href={component.sourceUrl}>
@@ -285,11 +291,7 @@ const { previous: previousComponent, next: nextComponent } = catalogNeighbors(co
           <h2 id="usage-title">
             <span data-i18n="When to use">When to use</span>
           </h2>
-          <ul>
-            {component.whenToUse.map(item => (
-              <li data-i18n={item}>{item}</li>
-            ))}
-          </ul>
+          <Template part="usage" />
         </section>
         <section
           id="examples"
@@ -445,11 +447,7 @@ const { previous: previousComponent, next: nextComponent } = catalogNeighbors(co
           <h2 id="accessibility-title">
             <span data-i18n="Accessibility">Accessibility</span>
           </h2>
-          <ul>
-            {component.accessibility.map(item => (
-              <li data-i18n={item}>{item}</li>
-            ))}
-          </ul>
+          <Template part="accessibility" />
         </section>
         <section
           id="notes"
@@ -461,11 +459,7 @@ const { previous: previousComponent, next: nextComponent } = catalogNeighbors(co
           <h2 id="notes-title">
             <span data-i18n="Implementation notes">Implementation notes</span>
           </h2>
-          <ul>
-            {component.notes.map(item => (
-              <li data-i18n={item}>{item}</li>
-            ))}
-          </ul>
+          <Template part="notes" />
         </section>
       </div>
       <div class="component-reference" data-component-reference>
@@ -549,19 +543,11 @@ const { previous: previousComponent, next: nextComponent } = catalogNeighbors(co
           )}
         </section>
       </div>
-      <DocsPageTools
-        placement="article"
-        sourcePath="docs/src/pages/components/[slug].astro"
-        pageTitle={component.title}
-      />
+      <DocsPageTools placement="article" sourcePath={page.sourcePath} pageTitle={component.title} />
       <PageNavigation previous={previousComponent} next={nextComponent} />
       <ShellFooter />
     </article>
-    <ContentsRail
-      items={sectionItems}
-      sourcePath="docs/src/pages/components/[slug].astro"
-      pageTitle={component.title}
-    />
+    <ContentsRail items={sectionItems} sourcePath={page.sourcePath} pageTitle={component.title} />
   </div>
   <script>
     import { installDocsPage } from '../../components/docs-page';

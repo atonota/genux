@@ -22,22 +22,39 @@ const managers = [
     Install the pinned Ant Design and React versions GenUX is built on, then use the adapters and
     styles listed under Source and resources.
   </p>
-  <div
-    class="docs-install-managers"
-    role="group"
-    aria-label="Package manager"
-    data-i18n-aria-label="Package manager"
-    data-install-managers
-    hidden
-  >
-    {managers.map(([id]) => (
-      <button type="button" class="doc-choice" data-install-manager={id} aria-pressed="false">
-        {id}
-      </button>
-    ))}
+  {/* One command variant picker; without JS the four commands below stay readable. The
+      supplied draft's shared command surface is retained, with one discoverable control. */}
+  <div class="docs-install-command">
+    <div class="docs-install-picker" data-install-picker hidden>
+      <div class="docs-install-control" data-install-control>
+        <label data-install-label data-i18n="Package manager">
+          Package manager
+        </label>
+        <button type="button" class="docs-install-trigger" data-install-trigger>
+          <span data-install-value>npm</span>
+          <span class="docs-install-chevron" aria-hidden="true">
+            ⌄
+          </span>
+        </button>
+      </div>
+      <div class="docs-install-positioner" data-install-positioner>
+        <ul class="docs-install-options" data-install-options>
+          {managers.map(([id]) => (
+            <li class="docs-install-option" data-install-manager={id}>
+              <span>{id}</span>
+              <span class="docs-install-selected" aria-hidden="true" data-i18n="Selected">
+                Selected
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+    {managers.map(([id, command]) => <pre
+      data-install-command={id}
+    ><code>{`${command} ${packages}`}</code></pre>)}
   </div>
-  {managers.map(([id, command]) => <pre
-    data-install-command={id}
-  ><code>{`${command} ${packages}`}</code></pre>)}
-  <pre><code>{`git clone ${repositoryUrl}.git`}</code></pre>
+  <div class="docs-install-command">
+    <pre><code>{`git clone ${repositoryUrl}.git`}</code></pre>
+  </div>
 </div>

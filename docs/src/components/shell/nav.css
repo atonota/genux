@@ -69,17 +69,77 @@
 .sidebar .navigation ul {
   list-style: none;
   padding: 0;
-  margin: 0 0 var(--shell-ui-space-group);
+  margin: 0;
 }
 .sidebar .navigation li {
   margin: 0;
+}
+.sidebar .nav-group {
+  margin-block-end: var(--shell-ui-space-control);
+}
+.sidebar .nav-group > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--shell-ui-space-tight);
+  min-block-size: var(--shell-ui-target);
+  padding-inline: var(--shell-ui-space-control);
+  list-style: none;
+  cursor: pointer;
+}
+.sidebar .nav-group > summary::-webkit-details-marker {
+  display: none;
+}
+/* Keyboard focus only (central modality and :focus-visible): the group row takes the sidebar list
+   treatment that focus-01.css delegates here, not the inverted button fill. The required cue is one
+   start-edge bar painted as a background layer; background-image, -size and -position are outside the
+   shared eased paint list, so it is visible on the first focused frame while the focus surface eases
+   in and the label keeps its rest color (AGENT.md: focus marks are immediate, never faded). Nothing
+   surrounds; the chevron and disclosure motion are unchanged. */
+:root[data-input-modality='keyboard'] .sidebar .navigation .nav-group > summary:focus-visible {
+  background-color: var(--focus-bg);
+  background-image: linear-gradient(var(--focus-indicator-color), var(--focus-indicator-color));
+  background-position: 0 0;
+  background-size: var(--focus-indicator-width) 100%;
+  background-repeat: no-repeat;
+  color: inherit;
+}
+.sidebar .nav-group-chevron {
+  color: var(--shell-ui-muted);
+  transform: rotate(0deg);
+  transition: transform var(--transition-duration) var(--motion-easing);
+}
+.sidebar .nav-group[open] > summary .nav-group-chevron {
+  transform: rotate(90deg);
+}
+/* Native semantics change immediately. The shared transition is symmetric and interruptible;
+   engines without details-content retain fully usable native progressive disclosure. */
+.sidebar .nav-group::details-content {
+  opacity: 0;
+  transition:
+    opacity var(--transition-duration) var(--motion-easing),
+    content-visibility var(--transition-duration) var(--motion-easing);
+  transition-behavior: allow-discrete;
+}
+.sidebar .nav-group[open]::details-content {
+  opacity: 1;
+}
+@starting-style {
+  .sidebar .nav-group[open]::details-content {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sidebar .nav-group::details-content,
+  .sidebar .nav-group-chevron {
+    transition: none;
+  }
 }
 .sidebar .nav-group h2 {
   font-size: var(--text);
   line-height: var(--line-height);
   font-weight: var(--shell-ui-emphasis);
-  margin-block: var(--shell-ui-space-control) var(--shell-ui-space-tight);
-  padding-inline: var(--space-sm);
+  margin: 0;
 }
 /* Clickable rows touch; the visible paint lives on ::before, inset 2px on the
    block axis, so adjacent backgrounds keep a 4px gap without dead zones. */

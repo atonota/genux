@@ -1,11 +1,9 @@
-import { readMigratedItem } from '../storage-migration';
 import { translate } from '../i18n';
 
 // Component page behaviour for pages/components/[slug].astro: four tabs over the eight
 // server-rendered sections, active-tab filtering of the existing section and contents links,
 // copy as Markdown and the shared package manager. Without it every section stays readable.
 const defaultTab = 'examples';
-const managerKey = 'genux-package-manager';
 
 const text = (node: Element) => (node.textContent ?? '').trim().split(/\s+/).join(' ');
 // Headings, paragraphs and list items keep their inline destinations and code spans; the
@@ -36,7 +34,7 @@ function toMarkdown(article: HTMLElement): string {
   for (const node of nodes) {
     if (
       node.closest(
-        '[data-doc-demo], .genux-demo, astro-island, [data-doc-tools], [data-install-managers], .page-breadcrumb, .page-neighbors, footer, [data-doc-contents], [data-doc-tabs]',
+        '[data-doc-demo], .genux-demo, astro-island, [data-doc-tools], [data-install-picker], .page-breadcrumb, .page-neighbors, footer, [data-doc-contents], [data-doc-tabs]',
       ) ||
       node.parentElement?.closest('pre, li, tr')
     )
@@ -68,10 +66,6 @@ export function installDocsPage(root: Document): () => void {
   const panels = [...article.querySelectorAll<HTMLElement>('[data-doc-panel]')];
   const links = [...root.querySelectorAll<HTMLAnchorElement>('[data-doc-nav] a[href^="#"]')];
   const install = article.querySelector<HTMLElement>('[data-install]');
-  const choices = [
-    ...(install?.querySelectorAll<HTMLButtonElement>('[data-install-manager]') ?? []),
-  ];
-  const commands = [...(install?.querySelectorAll<HTMLElement>('[data-install-command]') ?? [])];
   const controller = new AbortController();
   const { signal } = controller;
 
@@ -179,36 +173,15 @@ export function installDocsPage(root: Document): () => void {
     );
   }
 
-  const choose = (manager: string) => {
-    const known = choices.some(item => item.dataset.installManager === manager) ? manager : 'npm';
-    for (const item of choices)
-      item.setAttribute('aria-pressed', String(item.dataset.installManager === known));
-    for (const item of commands) item.hidden = item.dataset.installCommand !== known;
-  };
-  if (install && choices.length) {
-    let stored = '';
-    try {
-      stored = readMigratedItem(view.localStorage, managerKey) ?? '';
-    } catch {
-      // Blocked storage keeps npm for this page.
-    }
-    install.querySelector<HTMLElement>('[data-install-managers]')?.removeAttribute('hidden');
-    install.addEventListener(
-      'click',
-      event => {
-        const manager = (event.target as Element).closest<HTMLElement>('[data-install-manager]')
-          ?.dataset.installManager;
-        if (!manager) return;
-        choose(manager);
-        try {
-          view.localStorage.setItem(managerKey, manager);
-        } catch {
-          // The choice still applies to this page.
-        }
-      },
-      { signal },
-    );
-    choose(stored);
+  let disposePicker = () => {};
+  if (install) {
+    void import('./install-picker')
+      .then(({ installPackagePicker }) => {
+        if (!signal.aborted) disposePicker = installPackagePicker(install);
+      })
+      .catch(() => {
+        // If the enhancement cannot load, all server-rendered commands remain readable.
+      });
   }
 
   // Sections become tabpanels named by their tab and heading only while the tabs work; the
@@ -233,7 +206,8 @@ export function installDocsPage(root: Document): () => void {
 
   return () => {
     controller.abort();
-    for (const node of [...panels, ...links, ...commands]) node.hidden = false;
+    disposePicker();
+    for (const node of [...panels, ...links]) node.hidden = false;
     for (const panel of panels) panel.inert = false;
     for (const { panel, role, labelledBy } of original) {
       restore(panel, 'role', role);

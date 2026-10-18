@@ -68,8 +68,17 @@ const searchFrameStyle: Record<string, string> = {
     </div>
     <div class="nav-scroll" data-docs-nav-scroll>
       {foundationGroups.map(group => (
-        <section class="nav-group">
-          <h2 data-i18n={group.label}>{group.label}</h2>
+        <details
+          class="nav-group"
+          data-nav-group={group.label}
+          open={group.links.some(item => slug === item.slug)}
+        >
+          <summary>
+            <h2 data-i18n={group.label}>{group.label}</h2>
+            <span class="nav-group-chevron" aria-hidden="true">
+              ›
+            </span>
+          </summary>
           <ul class="nav-foundations">
             {group.links.map(item => (
               <li>
@@ -82,11 +91,20 @@ const searchFrameStyle: Record<string, string> = {
               </li>
             ))}
           </ul>
-        </section>
+        </details>
       ))}
       {catalogGroups.map(group => (
-        <section class="nav-group">
-          <h2 data-i18n={group.label}>{group.label}</h2>
+        <details
+          class="nav-group"
+          data-nav-group={group.label}
+          open={group.components.some(item => slug === item.slug)}
+        >
+          <summary>
+            <h2 data-i18n={group.label}>{group.label}</h2>
+            <span class="nav-group-chevron" aria-hidden="true">
+              ›
+            </span>
+          </summary>
           <ul>
             {group.components.map(item => (
               <li data-component-link={item.title + ' ' + item.slug}>
@@ -100,7 +118,7 @@ const searchFrameStyle: Record<string, string> = {
               </li>
             ))}
           </ul>
-        </section>
+        </details>
       ))}
     </div>
   </nav>

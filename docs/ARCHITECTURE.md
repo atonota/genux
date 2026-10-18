@@ -20,8 +20,8 @@ tokens, themes and existing tests) remains outside application infrastructure re
 | Source copy route         | `src/pages/source/[...path].txt.ts`                                                          | Static paths and text responses over the published set, with the Pages machine-prefix redaction and credential fail-closed guard                                                 |
 | Component page controller | `src/components/docs-page.ts`                                                                | Tabs, section links/history, article Markdown copying and package-manager choice                                                                                                 |
 | Component route contract  | `src/data/component-routes.ts`                                                               | Per catalog slug: React island module/export and component stylesheets in cascade order; pure data safe for client bundles                                                       |
-| Component page model      | `src/data/component-page.ts`                                                                 | Published source/test resources, generated Astro example, tab groups, section items and catalog neighbours over the visible order                                                                       |
-| Catalog navigation order  | `src/data/component-navigation.ts`                                                           | Visible catalog order shared by the sidebar, the catalog page and previous/next: category groups in first-appearance order with their section ids; pure data over the catalog     |
+| Component page model      | `src/data/component-page.ts`                                                                 | Published source/test resources, generated Astro example, tab groups, section items and catalog neighbours over the visible order                                                |
+| Catalog navigation order  | `src/data/component-navigation.ts`                                                           | Visible catalog order shared by the sidebar, the catalog page and previous/next: category groups in first-appearance order with their section ids; pure data over the catalog    |
 | Component route view      | `src/pages/components/[slug].astro`                                                          | Literal demo and `?url` stylesheet imports, stylesheet name/URL binding and page markup                                                                                          |
 | Preview registry          | `src/preview/registry.ts`                                                                    | Literal dynamic demo loaders; source, export and stylesheets derive from the route contract                                                                                      |
 | Preview document          | `src/pages/preview/[id]/[profile].astro`                                                     | Standalone build-time preview document for one example/profile (protected)                                                                                                       |
@@ -157,3 +157,30 @@ header action lost the shared `.docs-action` class and is hidden below the sideb
 breakpoint, rail titles take the shell emphasis weight, the sidebar and rail asides are
 named, and the shared footer links the validated repository. `SHELL-UX.md` records the
 browser evidence; CI and live acceptance remain root's receipts.
+
+## Task03 page-specific documentation composition
+
+`src/templates/components/*.tsx` owns literal page headings, leads, usage, accessibility
+and notes. Shared `content.tsx` only renders semantic translated lists; each component
+function selects its own introduction and prose composition. `registry.ts` maps each
+published slug to its distinct Template and editable source. No client directive is
+applied: Astro server-renders these React templates, while the unchanged literal demo
+branches in `pages/components/[slug].astro` keep their original islands and delivery.
+`templates/hubs/*.tsx` supplies distinct editable content for each dynamic section hub.
+Explicit sourcePath flows through DocsLayout, article and contents tools; static pages
+retain their existing file owner. Raw source publication remains allowlisted separately.
+
+`components/install-picker.ts` adapts installed Zag vanilla select for command variants;
+its disposer stops the machine and restores all SSR commands. The engine keeps its own
+`hidden` on the listbox; `documentation.css` moves the list one tight space on the block axis
+both ways (`translate`) and lets `display` leave discretely (`transition-behavior:
+allow-discrete` + `@starting-style`, the same contract as the Drawer in `shell/layout.css`).
+An opacity fade would hide the highlighted option's start-edge marker on entry and a
+transitioned `visibility` would refuse the engine's keyboard focus, so neither is used. The
+trigger and the sidebar group summary take their keyboard cue from their own stylesheets:
+the focus surface plus one marker painted as a `background-image` layer (the field precedent
+in `focus-fields.css`), which is outside the shared eased paint list and therefore visible on
+the first focused frame while the label keeps its rest color. Outer documentation tab
+history remains in `docs-page.ts`. Native sidebar disclosures use `shell/nav-groups.ts`
+for user/session state and `component-filter.ts` for temporary search projection. Shared
+prose list spacing never supplies gaps to wrapping demo navigation rows.

@@ -1,7 +1,9 @@
 import { normalizeSearch } from '../../i18n';
+import { createNavGroups } from './nav-groups';
 
 /** One canonical query; ordinary projection preserves focus, explicit recovery returns to the field. */
 export function createComponentFilter(document: Document): () => void {
+  const projectGroups = createNavGroups(document);
   const search = document.querySelector<HTMLInputElement>('#component-search');
   const clear = document.querySelector<HTMLButtonElement>('[data-docs-search-clear]');
   const storageKey = 'genux-docs-component-query';
@@ -40,6 +42,7 @@ export function createComponentFilter(document: Document): () => void {
         ? !group.querySelector('[data-component-link]:not([hidden])')
         : term.length > 0;
     });
+    projectGroups(term.length > 0);
     const status = document.querySelector<HTMLElement>('#search-status');
     if (status) status.hidden = visible > 0;
   };

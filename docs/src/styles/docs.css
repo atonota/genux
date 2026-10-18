@@ -152,6 +152,14 @@ ul {
 li + li {
   margin-top: var(--space-xs);
 }
+/* Component example navigations lay their links out as one wrapping row; the prose item gap
+   above would drop every link after the first below the row axis. The row gap owns spacing. */
+.genux-demo :is(ul, ol)[class$='-navigation'] {
+  align-items: center;
+}
+.genux-demo :is(ul, ol)[class$='-navigation'] > li {
+  margin-block: 0;
+}
 code,
 pre {
   font-family: var(--font-code);

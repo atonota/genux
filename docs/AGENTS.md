@@ -1,3 +1,38 @@
+# Task03 documentation ownership and shell controls — 2026-10-18
+
+Component documentation prose/composition lives in a meaningful separate TSX template per
+published slug under `src/templates/components` (Card.tsx, Button.tsx, etc.). The server-only
+`src/templates/registry.ts` supplies the explicit owner to layout/article/rail tools. Four
+`src/templates/hubs` files own the canonical dynamic hubs. Static human pages retain their
+unique Astro owner. The shared component route keeps literal live demo imports/hydration,
+API/code/resources and stylesheet delivery; templates never import/clone product demos.
+Edit targets are the actual page template; shared route/layout remain contextual resources.
+The existing raw source allowlist is unchanged; unpublished template source uses the existing
+GitHub View source fallback. Preserve canonical paths and SEO for both hosting bases.
+
+Native sidebar details/summary groups start the active group open. `nav-groups.ts` owns
+session disclosure choices; component-filter projects matching groups temporarily open and
+restores the user's normal choices after clear. The same DOM continues into the Drawer.
+`install-picker.ts` uses installed Zag select/vanilla for the single command-header picker;
+`docs-page.ts` retains the sole outer tab/hash/history owner. Commands all remain readable
+without JS. Disclosure and popup presentation consume central symmetric motion tokens and
+reduced motion; keyboard paint uses central modality and focus-visible only.
+
+Task03 checks: `node --test docs/tests/task03.test.mjs`, existing docs format/lint/check/build,
+browser types and `playwright test --config docs/browser/task03.config.ts`. Browser config
+uses prebuilt static output. Actor-sandbox browser/HTTP restrictions mean an unrun journey,
+measurement or screenshot remains `not_run`; source is not visual/CI/live acceptance.
+Required keyboard focus cues paint on the first focused frame. Every shell surface eases
+`background-color` and `color` centrally, so a cue expressed only through those properties is
+faded in and is a defect, not evidence. The sidebar group summary and the picker trigger carry
+one non-surrounding marker as a `background-image` layer (the field precedent in
+`focus-fields.css`), which is outside the eased paint list; browser evidence asserts that cue
+once, immediately, against the rest state and never polls or waits for a fill to settle. Only
+the decorative focus surface eases. Screenshots may wait for finite decorative transitions to
+settle. Popup/listbox presentation must never transition `visibility` or fade opacity over the
+focused option marker; the list moves on the block axis with the discrete `display` exit so the
+engine can focus the opened list and its highlighted marker is visible at once.
+
 # Astro documentation maintenance contract
 
 ## Shell UX candidate — human scope 2026-10-18
