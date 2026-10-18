@@ -1,7 +1,10 @@
+import { createNavFlyout } from './nav-flyout';
+
 /** Native disclosures keep links usable without JS. Search projects a temporary open state;
  * the reader's ordinary choices stay separate and survive navigation within this session. */
 export function createNavGroups(root: Document): (searching: boolean) => void {
   const groups = [...root.querySelectorAll<HTMLDetailsElement>('details[data-nav-group]')];
+  const closeFlyout = createNavFlyout(root, groups);
   const view = root.defaultView;
   const key = 'genux-docs-nav-groups';
   let stored: Record<string, boolean> = {};
@@ -14,19 +17,27 @@ export function createNavGroups(root: Document): (searching: boolean) => void {
   } catch {
     // A denied or invalid saved preference never prevents native disclosure.
   }
-  const desired = new Map(
-    groups.map(group => [
-      group,
-      !!group.querySelector('[aria-current="page"]') ||
-        (stored[group.dataset.navGroup ?? ''] ?? group.open),
-    ]),
-  );
+  // The current route wins over older sessions that saved several expanded groups.
+  const initial =
+    groups.find(group => group.querySelector('[aria-current="page"]')) ??
+    groups.find(group => stored[group.dataset.navGroup ?? ''] ?? group.open);
+  const desired = new Map(groups.map(group => [group, group === initial]));
   let searching = false;
   for (const group of groups) {
+    group.name = 'docs-navigation-groups';
     group.open = desired.get(group) ?? false;
     group.querySelector('summary')?.addEventListener('click', () => {
+      const opening = !group.open;
+      if (opening) {
+        for (const other of groups) {
+          if (other !== group) {
+            other.open = false;
+            if (!searching) desired.set(other, false);
+          }
+        }
+      }
       if (searching) return;
-      desired.set(group, !group.open);
+      desired.set(group, opening);
       try {
         view?.sessionStorage.setItem(
           key,
@@ -42,7 +53,11 @@ export function createNavGroups(root: Document): (searching: boolean) => void {
     });
   }
   return active => {
+    closeFlyout();
     searching = active;
-    for (const group of groups) group.open = active ? !group.hidden : (desired.get(group) ?? false);
+    const selected = active
+      ? (groups.find(group => !group.hidden && group.open) ?? groups.find(group => !group.hidden))
+      : groups.find(group => desired.get(group));
+    for (const group of groups) group.open = group === selected;
   };
 }

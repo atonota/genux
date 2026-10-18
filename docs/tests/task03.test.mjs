@@ -37,6 +37,7 @@ test('search opens collapsed matching groups without replacing user disclosure s
     <div data-docs-nav-scroll>
     <details class="nav-group" data-nav-group="Start" open><summary>Start</summary><ul><li><a aria-current="page">Home</a></li></ul></details>
     <details class="nav-group" data-nav-group="Actions"><summary>Actions</summary><ul><li data-component-link="Button button"><a>Button</a></li></ul></details>
+    <details class="nav-group" data-nav-group="Layout"><summary>Layout</summary><ul><li data-component-link="Button layout"><a>Layout button</a></li></ul></details>
     </div><p id="search-status" hidden></p>`,
     { url: 'https://genux.test/' },
   );
@@ -47,11 +48,22 @@ test('search opens collapsed matching groups without replacing user disclosure s
   document.querySelector('#component-search').value = 'button';
   filter();
   assert.equal(group.open, true, 'a match in a collapsed group is reachable');
+  assert.equal(
+    document.querySelectorAll('.nav-group[open]').length,
+    1,
+    'search keeps one group open',
+  );
   assert.equal(document.querySelector('[data-nav-group="Start"]').hidden, true);
   document.querySelector('[data-docs-search-clear]').click();
   assert.equal(group.open, false, 'clearing restores the prior collapsed user state');
   assert.equal(document.querySelector('[data-nav-group="Start"]').open, true);
   assert.equal(document.activeElement.id, 'component-search');
+  group.querySelector('summary').click();
+  assert.equal(document.querySelector('[data-nav-group="Start"]').open, false);
+  assert.equal(group.open, true);
+  document.querySelector('[data-nav-group="Layout"] summary').click();
+  assert.equal(group.open, false, 'opening another group collapses the previous one');
+  assert.equal(document.querySelectorAll('.nav-group[open]').length, 1);
   dom.window.close();
 });
 

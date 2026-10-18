@@ -2,6 +2,7 @@
    Nested components and device screens do not consume any --shell-ui-* role. */
 [data-docs-shell] {
   --shell-ui-picker-width: 12rem;
+  --shell-ui-nav-flyout-width: 18rem;
   --shell-ui-popup-layer: 10;
   --shell-ui-popup-shadow: var(--shadow-soft);
   --shell-ui-text: max(14px, var(--text));

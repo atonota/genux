@@ -5,6 +5,18 @@ using page actions and continuing to the next reference. The common shell retain
 GenUX’s Flat 2.0 language, palette and Outfit. Component product, previews, native
 adapters, tokens and themes are outside this change.
 
+Sidebar groups use native details/summary with a shared name: click toggles the links
+inline and opening a group closes the previous one, including without JavaScript in
+supporting browsers. The current group starts open and session choices survive navigation.
+Search keeps one matching group open; clearing restores the ordinary choice. On a wide layout with a
+hover-capable precise pointer, a closed heading also opens its links to the right.
+`nav-flyout.ts` owns this temporary native popover, outside scroll clipping; it never
+changes the saved disclosure state. Leaving the heading/panel closes it after a short
+pointer transit allowance. Escape, outside click, search, scrolling and resize dismiss it.
+Touch, narrow layouts and browsers without Popover use the same inline disclosures.
+The flyout consumes shell surface/width roles, central symmetric motion and reduced
+motion; its real navigation links retain the shared ringless keyboard focus treatment.
+
 The second 2026-10-18 pass keeps component queries in tab-scoped session storage (blocked
 storage falls back to ordinary filtering). A nonempty component query temporarily yields
 the foundation groups to the matching components; Clear restores the full navigation.

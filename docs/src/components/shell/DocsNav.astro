@@ -70,6 +70,7 @@ const searchFrameStyle: Record<string, string> = {
       {foundationGroups.map(group => (
         <details
           class="nav-group"
+          name="docs-navigation-groups"
           data-nav-group={group.label}
           open={group.links.some(item => slug === item.slug)}
         >
@@ -96,6 +97,7 @@ const searchFrameStyle: Record<string, string> = {
       {catalogGroups.map(group => (
         <details
           class="nav-group"
+          name="docs-navigation-groups"
           data-nav-group={group.label}
           open={group.components.some(item => slug === item.slug)}
         >
