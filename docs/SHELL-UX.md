@@ -5,6 +5,30 @@ using page actions and continuing to the next reference. The common shell retain
 GenUX’s Flat 2.0 language, palette and Outfit. Component product, previews, native
 adapters, tokens and themes are outside this change.
 
+The second 2026-10-18 pass keeps component queries in tab-scoped session storage (blocked
+storage falls back to ordinary filtering). A nonempty component query temporarily yields
+the foundation groups to the matching components; Clear restores the full navigation.
+Browser-restored input wins over stored query. The native Drawer returns focus to its
+actual invoker rather than always Menu, while desktop placement retains sidebar focus.
+`section-navigation.ts` enhances existing native fragment links with `aria-current=location`
+and deliberate labelled-target focus with a heading marker; it introduces no router, scrollspy or history store.
+Component tabs retain their own hash/panel ownership. Narrow article Page actions is a
+native initially closed disclosure; desktop rail actions stay expanded. The footer links
+both the project MIT license and third-party notices through the validated repository/ref.
+
+The Claude round of the second pass (2026-10-18) ran the browser layer the Codex round could
+not and corrected what it found. The header Search trigger focuses itself before it opens the
+Drawer (`shell-controls.ts`): WebKit does not focus a button on pointer click, so the single
+Drawer owner would otherwise return focus to Menu instead of Search. Below the contents rail
+the "On this page" and "Page actions" disclosures are one group (`layout.css`,
+`page-tools.css`): 48px summary rows on the shell emphasis weight with the container-sm
+inset, touching, with their open link lists on the same text edge; the Contents summary and
+links keep the ≥16px inset inside the details box that the protected spacing spec measures.
+Copy as Markdown keeps inline links as `[text](resolved href)` and inline code as
+`` `code` `` in headings, paragraphs and list items (`docs-page.ts`); table cells, code
+blocks and the existing exclusions are unchanged. Visual/physical-device, independent
+aggregate acceptance, CI and live outcomes still require their own actual evidence.
+
 ## Ownership
 
 - `src/layouts/DocsLayout.astro` owns the document/header and supplies title and
@@ -109,6 +133,18 @@ The isolated shell browser configuration avoids unrelated FAB discovery:
 ```sh
 node node_modules/@playwright/test/cli.js test --config docs/browser/shell-ux.config.ts
 ```
+
+For the second pass's changed journeys only, append `shell-journeys.spec.ts`. The shell
+configuration now serves the already built `docs/dist` using Python's installed static
+HTTP server, avoiding Astro preview's nested cache side effects. Screenshots and computed
+type/layout records are attached when execution is available; none is inferred from unit tests.
+Three of its steps are engine-neutral on purpose: it waits for `[data-docs-shell-ready]` after a
+search-result navigation before using the Search trigger (Firefox otherwise clicks before the
+script attaches), it turns the keyboard modality on with a Tab keydown and then focuses the
+Contents link directly (WebKit keeps links out of its Tab sequence), and the ringless target
+asserts `outline-style: none` (CSS UI 4 computes a width even then). The Claude round ran
+`shell-ux.spec.ts` + `shell-journeys.spec.ts` on the rebuilt candidate in Chromium 156,
+Firefox 157 and WebKit 27.2; the exact result is in that round's artifacts, not here.
 
 It uses existing installed engines and a candidate production preview on localhost
 4335, never personal Chrome. Chromium takes bounded phone/landscape/tablet/desktop

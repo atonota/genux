@@ -8,6 +8,22 @@ const defaultTab = 'examples';
 const managerKey = 'genux-package-manager';
 
 const text = (node: Element) => (node.textContent ?? '').trim().split(/\s+/).join(' ');
+// Headings, paragraphs and list items keep their inline destinations and code spans; the
+// anchor's resolved href names the real page, not a route-relative path.
+const inline = (node: Element): string => {
+  let out = '';
+  for (const child of node.childNodes) {
+    if (child.nodeType === child.TEXT_NODE) out += child.textContent ?? '';
+    if (child.nodeType !== child.ELEMENT_NODE) continue;
+    const element = child as Element;
+    if (element.localName === 'a' && element.hasAttribute('href'))
+      out += `[${inline(element)}](${(element as HTMLAnchorElement).href})`;
+    else if (element.localName === 'code') out += '`' + (element.textContent ?? '') + '`';
+    else out += inline(element);
+  }
+  return out;
+};
+const line = (node: Element) => inline(node).trim().split(/\s+/).join(' ');
 const prefixes: Record<string, string> = { h1: '# ', h2: '## ', h3: '### ', li: '- ' };
 // Table cells escape backslashes and pipes so union types in API columns stay one cell each;
 // text() already folds line breaks into single spaces.
@@ -32,7 +48,7 @@ function toMarkdown(article: HTMLElement): string {
       if (node.parentElement?.localName === 'thead')
         blocks.push(row + '\n|' + ' --- |'.repeat(cells.length));
       else blocks.push((blocks.pop() ?? '') + '\n' + row);
-    } else blocks.push((prefixes[node.localName] ?? '') + text(node));
+    } else blocks.push((prefixes[node.localName] ?? '') + line(node));
   }
   return blocks.join('\n\n') + '\n';
 }
@@ -102,6 +118,9 @@ export function installDocsPage(root: Document): () => void {
     url.searchParams.set('tab', group);
     url.hash = '';
     view.history[mode](null, '', url);
+    // pushState/replaceState do not emit hashchange; the shell reflects the actual
+    // location after this sole tab/history owner has cleared the fragment.
+    article.dispatchEvent(new view.CustomEvent('genux-doc-location-change', { bubbles: true }));
   };
   const keys: Record<string, (index: number) => number> = {
     ArrowLeft: index => (index + tabs.length - 1) % tabs.length,

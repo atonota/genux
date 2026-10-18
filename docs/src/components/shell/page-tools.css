@@ -1,14 +1,55 @@
 [data-docs-shell] .docs-page-tools {
+  display: block;
+  margin-block: var(--shell-ui-space-section) 0;
+  font-size: var(--shell-ui-text);
+  color: var(--shell-ui-reading-muted);
+}
+[data-docs-shell] .docs-page-tools-links {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 0 var(--shell-ui-space-group);
-  margin-block: var(--shell-ui-space-section);
-  font-size: var(--shell-ui-text);
-  color: var(--shell-ui-reading-muted);
+}
+/* Article placement: the same 48px summary row, emphasis weight and container-sm inset as
+   the Contents disclosure it follows (layout.css), touching it as one group; the open list
+   keeps that inset. The next section or tab row supplies the gap below. */
+[data-docs-shell] .docs-page-tools > summary {
+  box-sizing: border-box;
+  margin: 0;
+  min-block-size: var(--shell-ui-target);
+  padding: var(--shell-ui-space-control) var(--inset-container-sm, 16px);
+  list-style-position: inside;
+  cursor: pointer;
+}
+[data-docs-shell] [data-doc-contents] + [data-doc-tools='article'] {
+  margin-block-start: 0;
+}
+[data-docs-shell] [data-doc-tools='article'] > .docs-page-tools-links {
+  padding: 0 var(--inset-container-sm, 16px) var(--shell-ui-space-control);
+}
+/* Native open/focus semantics stay immediate; presentation uses the shared Cubic in
+   both directions. Older engines retain the native disclosure without this enhancement. */
+[data-docs-shell] details.docs-page-tools::details-content {
+  opacity: 0;
+  transition:
+    opacity var(--transition-duration) var(--motion-easing),
+    content-visibility var(--transition-duration) var(--motion-easing);
+  transition-behavior: allow-discrete;
+}
+[data-docs-shell] details.docs-page-tools[open]::details-content {
+  opacity: 1;
+}
+@starting-style {
+  [data-docs-shell] details.docs-page-tools[open]::details-content {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-docs-shell] details.docs-page-tools::details-content {
+    transition: none;
+  }
 }
 [data-docs-shell] .docs-page-tools .shell-tools-title {
-  flex-basis: 100%;
   margin: 0 0 var(--shell-ui-space-tight);
   color: var(--shell-ui-reading-ink);
   font-weight: var(--shell-ui-emphasis);
@@ -44,10 +85,12 @@
 }
 @media (min-width: 80rem) {
   [data-docs-shell] .shell-contents .docs-page-tools {
+    margin-block: var(--shell-ui-space-section) 0;
+  }
+  [data-docs-shell] .shell-contents .docs-page-tools-links {
     display: grid;
     justify-items: start;
     gap: 0;
-    margin-block: var(--shell-ui-space-section) 0;
   }
   [data-docs-shell] .shell-contents:has([data-shell-contents-nav][hidden]) .docs-page-tools {
     margin-block-start: 0;

@@ -10,6 +10,7 @@ interface Props {
   pageTitle: string;
 }
 const { placement, sourcePath, pageTitle } = Astro.props;
+const Container = placement === 'article' ? 'details' : 'div';
 const source = sourceHref(sourcePath) ?? `${repositoryUrl}/blob/${repositoryBranch}/${sourcePath}`;
 const edit = `${repositoryUrl}/edit/${repositoryBranch}/${sourcePath}`;
 const pagePath = logicalPath(Astro.url.pathname, import.meta.env.BASE_URL);
@@ -18,21 +19,29 @@ issue.searchParams.set('title', `Documentation: ${pageTitle}`);
 issue.searchParams.set('body', `Page: ${pagePath}\nSource: ${sourcePath}\n\nDescribe the issue:\n`);
 ---
 
-<div class="docs-page-tools" data-doc-tools={placement}>
-  <p class="shell-tools-title" data-shell-i18n="Page actions">
-    Page actions
-  </p>
-  <a href={source}>
-    <span data-i18n="View page source">View page source</span>
-  </a>
-  <a href={edit}>
-    <span data-i18n="Edit this page">Edit this page</span>
-  </a>
-  <a href={issue.href}>
-    <span data-i18n="Report an issue">Report an issue</span>
-  </a>
-  <button type="button" class="doc-choice" data-doc-copy-markdown hidden>
-    <span data-i18n="Copy as Markdown">Copy as Markdown</span>
-  </button>
-  <p role="status" aria-atomic="true" data-doc-copy-status></p>
-</div>
+<Container class="docs-page-tools" data-doc-tools={placement}>
+  {placement === 'article' ? (
+    <summary class="shell-tools-title" data-shell-i18n="Page actions">
+      Page actions
+    </summary>
+  ) : (
+    <p class="shell-tools-title" data-shell-i18n="Page actions">
+      Page actions
+    </p>
+  )}
+  <div class="docs-page-tools-links">
+    <a href={source}>
+      <span data-i18n="View page source">View page source</span>
+    </a>
+    <a href={edit}>
+      <span data-i18n="Edit this page">Edit this page</span>
+    </a>
+    <a href={issue.href}>
+      <span data-i18n="Report an issue">Report an issue</span>
+    </a>
+    <button type="button" class="doc-choice" data-doc-copy-markdown hidden>
+      <span data-i18n="Copy as Markdown">Copy as Markdown</span>
+    </button>
+    <p role="status" aria-atomic="true" data-doc-copy-status></p>
+  </div>
+</Container>

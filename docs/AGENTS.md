@@ -2,6 +2,18 @@
 
 ## Shell UX candidate — human scope 2026-10-18
 
+Second-pass shell continuity: component query memory is session-scoped and yields to
+browser-restored input; active component queries show component groups directly, with
+Clear restoring foundations. Drawer close returns the actual invoking focus. The shared
+`section-navigation.ts` reflects native fragments and focuses reached labelled sections/headings only on
+deliberate Contents activation; keep native history and the existing tab controller.
+Article Page actions uses a native disclosure, desktop rail actions stay expanded, and
+the footer links the validated project MIT license. The header Search trigger focuses
+itself before opening the Drawer so WebKit returns focus to it; below the rail the Contents
+and Page actions disclosures share one row height, weight and text edge; Copy as Markdown
+keeps inline links and code. See `SHELL-UX.md` for actual checks and engine-neutral spec
+steps; source changes are not visual acceptance.
+
 The serial shell UX task supersedes older appearance freezes only for the header,
 documentation navigation, Contents/page actions, previous/next and footer. Preserve the
 published component product, preview geometry/surfaces, URL/SEO policy, palette, central

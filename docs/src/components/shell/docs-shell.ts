@@ -31,10 +31,13 @@ export function installDocsShell(root: Document): () => void {
   const controller = new AbortController();
   const { signal } = controller;
   let returnFocus = true;
+  let invoker: HTMLElement = toggle;
   sidebar.before(home);
 
   const openDrawer = () => {
     if (wide.matches || drawer.open) return;
+    const active = root.activeElement;
+    invoker = active instanceof HTMLElement && active !== root.body ? active : toggle;
     drawer.showModal();
     toggle.setAttribute('aria-expanded', 'true');
     // The list has layout now; nav-state restores its scroll before focus moves into it.
@@ -91,7 +94,13 @@ export function installDocsShell(root: Document): () => void {
     'close',
     () => {
       toggle.setAttribute('aria-expanded', 'false');
-      if (returnFocus && !wide.matches) toggle.focus();
+      if (returnFocus && !wide.matches)
+        (invoker.isConnected && !invoker.closest('[hidden], [inert], dialog:not([open])')
+          ? invoker
+          : toggle
+        ).focus({
+          preventScroll: true,
+        });
       returnFocus = true;
     },
     { signal },

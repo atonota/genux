@@ -1,5 +1,14 @@
 # GenUX maintenance contract
 
+The second 2026-10-18 shell pass records session query continuity, actual Drawer invoker
+return, native fragment location/target focus, a narrow Page actions disclosure and the
+project MIT footer link in `docs/SHELL-UX.md`; its Claude round adds the Search-trigger focus
+rule for WebKit invoker return, the narrow Contents/Page actions disclosure group and inline
+links/code in Copy as Markdown. Preserve the component tab/history owner and all product
+boundaries. The changed-journey browser command is the existing shell config with
+`shell-journeys.spec.ts`, over a prebuilt static `docs/dist`; an unrun browser layer is
+`not_run`, never source or visual acceptance.
+
 ## Shell UX candidate — human scope 2026-10-18
 
 The serial shell UX task supersedes older appearance freezes only for the header,

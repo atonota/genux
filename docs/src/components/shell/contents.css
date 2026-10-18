@@ -19,6 +19,20 @@
 [data-docs-shell] .shell-contents [hidden] {
   display: none;
 }
+[data-docs-shell] [data-doc-nav] a[aria-current='location'] {
+  color: var(--shell-ui-link);
+  font-weight: var(--shell-ui-emphasis);
+}
+[data-docs-shell] [data-shell-section-target]:focus {
+  outline: none;
+}
+:root[data-input-modality='keyboard'] [data-shell-section-target]:is(h1, h2, h3):focus-visible,
+:root[data-input-modality='keyboard'] [data-shell-section-target]:focus-visible > :is(h1, h2, h3) {
+  text-decoration: underline;
+  text-decoration-color: var(--focus-indicator-color);
+  text-decoration-thickness: var(--focus-indicator-width);
+  text-underline-offset: 0.25em;
+}
 @media (any-hover: hover) {
   [data-docs-shell] .shell-contents a:hover {
     color: var(--shell-ui-link);

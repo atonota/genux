@@ -214,7 +214,10 @@ dialog[data-docs-drawer][open]::backdrop {
   font-weight: var(--shell-ui-label);
 }
 
-/* Page contents: a closed disclosure until the rail breakpoint. */
+/* Page contents: a closed disclosure until the rail breakpoint. Below the rail it forms one
+   group with the Page actions disclosure that follows it (page-tools.css): both summaries
+   are 48px rows on the shell emphasis weight with the container-sm inset, and their open
+   link lists share that inset, so the two same-function controls read as one. */
 [data-docs-shell] .page-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -227,16 +230,20 @@ dialog[data-docs-drawer][open]::backdrop {
   color: var(--panel-ink, var(--ink));
 }
 [data-docs-shell] [data-doc-contents] > summary {
-  min-block-size: var(--target-min);
-  padding: var(--inset-container-sm, 16px);
+  box-sizing: border-box;
+  min-block-size: var(--shell-ui-target);
+  padding: var(--shell-ui-space-control) var(--inset-container-sm, 16px);
   cursor: pointer;
-  font-weight: var(--font-weight-label, 600);
+  font-weight: var(--shell-ui-emphasis);
 }
-/* The disclosure is the only painted enclosure: summary and links share the container-sm inset. */
+/* The disclosure is the only painted enclosure: summary and links share the container-sm inset.
+   Each link carries its own --space-sm inline padding (documentation.css), so the list inset
+   is reduced by that amount and the link text starts exactly at the summary text edge. */
 [data-docs-shell] [data-doc-contents] > [data-doc-nav='sections'] {
   display: grid;
   margin: 0;
-  padding: 0 var(--inset-container-sm, 16px) var(--inset-container-sm, 16px);
+  padding: 0 var(--inset-container-sm, 16px) var(--shell-ui-space-control);
+  padding-inline-start: calc(var(--inset-container-sm, 16px) - var(--space-sm));
 }
 [data-docs-shell] .page-grid > [data-doc-nav='toc'] {
   display: none;

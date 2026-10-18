@@ -1,6 +1,6 @@
 ---
 import manifest from '../../../../package.json';
-import { repositoryUrl } from '../../data/repository';
+import { repositoryBranch, repositoryUrl } from '../../data/repository';
 // One compact ending for component articles and guide pages, with no product version fiction.
 // The validated repository destination lives here so it stays reachable below the 1280px
 // header links at every width.
@@ -15,6 +15,9 @@ const version = manifest.version.split('.').slice(0, 2).join('.');
     <span data-i18n="Version">Version</span> {version} · Flat 2.0
   </span>
   <a href={repositoryUrl}>GitHub</a>
+  <a href={`${repositoryUrl}/blob/${repositoryBranch}/LICENSE`} data-shell-i18n="MIT license">
+    MIT license
+  </a>
   <a href="/licenses/">
     <span data-i18n="Third-party licenses">Third-party licenses</span>
   </a>

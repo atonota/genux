@@ -202,9 +202,11 @@ const seo = noindex
     <script>
       import { installDocsController } from './docs-controller';
       import { installDocsPage } from '../components/docs-page';
+      import { installSectionNavigation } from '../components/shell/section-navigation';
 
       installDocsController(document);
       installDocsPage(document);
+      installSectionNavigation(document);
     </script>
   </body>
 </html>

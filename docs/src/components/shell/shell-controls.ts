@@ -3,20 +3,24 @@ export function installDocsShellControls(document: Document): void {
   // Search documentation: the header button and Cmd/Ctrl+K focus the canonical sidebar search.
   // Below the breakpoint the sidebar lives in the closed Drawer, which the menu toggle opens.
   // One listener set per document; pagehide removes it and a restored page reinstalls it.
-  const focusSearch = () => {
+  const focusSearch = (invoker?: HTMLElement) => {
     const input = document.getElementById('component-search');
     if (!input) return;
     const drawer = input.closest('dialog');
-    if (drawer && !drawer.open)
+    if (drawer && !drawer.open) {
+      // The Drawer owner returns focus to the element focused when it opened. WebKit does
+      // not focus a button on pointer click, so the trigger takes focus before opening;
+      // the shortcut path keeps whatever control had focus.
+      invoker?.focus({ preventScroll: true });
       document.querySelector<HTMLButtonElement>('[data-docs-menu-toggle]')?.click();
+    }
     input.focus();
   };
   const installSearch = () => {
     const controller = new AbortController();
     const { signal } = controller;
-    document
-      .querySelector('[data-docs-search]')
-      ?.addEventListener('click', focusSearch, { signal });
+    const trigger = document.querySelector<HTMLElement>('[data-docs-search]');
+    trigger?.addEventListener('click', () => focusSearch(trigger), { signal });
     document.addEventListener(
       'keydown',
       event => {

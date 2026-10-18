@@ -29,6 +29,21 @@ tokens, themes and existing tests) remains outside application infrastructure re
 
 ## Dependency direction
 
+The second shell UX pass adds `shell/section-navigation.ts`, composed by `DocsLayout`
+after the existing component-page controller. It owns explicit fragment location and
+deliberate fragment-target focus over existing navigation links, preserving native URL/history
+and the component controller's tab ownership.
+The tab controller emits `genux-doc-location-change` after its programmatic history update,
+so the shell can clear fragment-location feedback without adding a router or key handler.
+Query memory belongs to `component-filter`
+and uses session storage with a blocked-storage fallback; it adds no global preference
+store. Article page tools use a native disclosure; rail tools remain an expanded list.
+`shell/shell-controls` focuses the Search trigger before it asks the menu toggle to open the
+Drawer, so `shell/docs-shell` (the only Drawer and return-focus owner) records the real
+invoker in every engine; the shortcut path leaves the focused control as the invoker. The
+Markdown serializer in `components/docs-page` keeps inline links and code; it adds no
+dependency and still excludes demos, tools, breadcrumb, neighbours, footer, contents and tabs.
+
 ```text
 layouts/DocsLayout.astro -> layouts/docs-controller
 layouts/docs-controller -> shell/component-filter, components/code-copy

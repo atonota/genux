@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url';
 
 export default defineConfig({
   testDir: '.',
-  testMatch: 'shell-ux.spec.ts',
+  testMatch: ['shell-ux.spec.ts', 'shell-journeys.spec.ts'],
   outputDir: process.env.GENUX_SHELL_UX_ARTIFACTS ?? '/tmp/genux-shell-ux-browser',
   retries: 0,
   workers: 1,
@@ -21,7 +21,7 @@ export default defineConfig({
     use: { browserName: browserName as 'chromium' | 'firefox' | 'webkit' },
   })),
   webServer: {
-    command: 'npm run docs:preview -- --ignore-lock --port 4335',
+    command: 'python3 -m http.server 4335 --bind 127.0.0.1 --directory docs/dist',
     cwd: fileURLToPath(new URL('../..', import.meta.url)),
     url: 'http://127.0.0.1:4335',
     reuseExistingServer: false,

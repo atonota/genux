@@ -123,7 +123,9 @@ test('shell search and measured header preserve keyboard ownership and bfcache r
   assert.equal(document.activeElement, search);
   assert.equal(search.value, 'input');
   close.click();
-  assert.equal(document.activeElement, toggle);
+  // The trigger focused itself before opening (WebKit never does on click), so the Drawer
+  // owner returns focus to the actual invoker rather than to Menu.
+  assert.equal(document.activeElement, trigger);
   for (const options of [
     { handled: true },
     { isComposing: true },
@@ -133,7 +135,7 @@ test('shell search and measured header preserve keyboard ownership and bfcache r
   ]) {
     key(options);
     assert.equal(drawer.open, false);
-    assert.equal(document.activeElement, toggle);
+    assert.equal(document.activeElement, trigger);
   }
   assert.equal(key({ metaKey: true, ctrlKey: false, key: 'K' }).defaultPrevented, true);
   assert.equal(document.activeElement, search);
